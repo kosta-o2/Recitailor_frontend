@@ -45,8 +45,8 @@ function App() {
   return (
     <>
       <Header />
-      <Posts props={mockdata} />
-      {/* <Outlet /> */}
+      {/* <Posts props={mockdata} /> */}
+      <Outlet />
       <Footer />
     </>
   );

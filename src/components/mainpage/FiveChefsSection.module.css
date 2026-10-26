@@ -1,0 +1,106 @@
+.chefs {
+  padding-block: 38px 80px;
+  border-top: 1px solid var(--border-default, #e0e0e0);
+}
+
+.chefs .chef_card h3 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+}
+
+.chefs .chef_grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px;
+  padding: 0;
+  margin: 44px 0 0;
+  list-style: none;
+}
+
+.chefs .chef_card {
+  min-width: 0;
+}
+
+.chefs .chef_portrait {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  aspect-ratio: 248 / 212;
+  overflow: hidden;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 16px;
+  background: var(--bg-surface, #ffffff);
+}
+
+.chefs .chef_portrait img {
+  display: block;
+  width: calc(100% - 30px);
+  height: auto;
+}
+
+.chefs .chef_card h3 {
+  margin-top: 12px;
+}
+
+.chefs .chef_role {
+  margin: 8px 0 0;
+  color: var(--text-서브색2, #767676);
+  font-size: 20px;
+}
+
+.chefs .chef_specialty {
+  margin: 8px 0 0;
+  color: var(--color-primary, #216b65);
+  font-size: 20px;
+}
+
+@media (max-width: 1399px) {
+  .chefs .chef_card h3 {
+    font-size: 22px;
+  }
+
+  .chefs .chef_role,
+  .chefs .chef_specialty {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .chefs .chef_grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 20px;
+    margin-top: 28px;
+  }
+
+  .chefs {
+    padding-block: 32px 56px;
+  }
+}
+
+@media (max-width: 767px) {
+  .chefs .chef_grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
+    margin-top: 24px;
+  }
+
+  .chefs .chef_portrait {
+    border-radius: 12px;
+  }
+
+  .chefs .chef_portrait img {
+    width: calc(100% - 20px);
+  }
+
+  .chefs .chef_card h3 {
+    font-size: 21px;
+  }
+
+  .chefs .chef_role,
+  .chefs .chef_specialty {
+    font-size: 14px;
+  }
+}

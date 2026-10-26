@@ -1,0 +1,151 @@
+.weather {
+  padding-block: 0 62px;
+}
+
+.weather .weather_heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.weather .weather_badge {
+  flex: 0 0 344px;
+  margin: 0;
+  padding: 12px 20px;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 6px;
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #222222);
+  font-size: 22px;
+  text-align: center;
+}
+
+.weather .three_columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  padding: 0;
+  margin: 44px 0 0;
+  list-style: none;
+}
+
+.weather .recipe_card {
+  min-width: 0;
+  padding: 20px 28px 24px;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 16px;
+  background: var(--bg-surface, #ffffff);
+}
+
+.weather .recipe_card h3 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+}
+
+.weather .recipe_description {
+  margin: 10px 0 0;
+  color: var(--text-secondary, #444444);
+  font-size: 22px;
+}
+
+.weather .ingredients {
+  margin: 20px 0 0;
+  color: var(--text-서브색2, #767676);
+  font-size: 20px;
+}
+
+.weather .cooking_time {
+  margin: 14px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (max-width: 1399px) {
+  .weather .weather_badge,
+  .weather .recipe_description {
+    font-size: 18px;
+  }
+
+  .weather .weather_badge {
+    flex-basis: 280px;
+  }
+
+  .weather .recipe_card {
+    padding: 20px;
+  }
+
+  .weather .recipe_card h3 {
+    font-size: 22px;
+  }
+
+  .weather .ingredients,
+  .weather .cooking_time {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .weather .weather_badge {
+    flex-basis: 210px;
+    font-size: 16px;
+  }
+
+  .weather .three_columns {
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .weather .recipe_card {
+    padding: 18px 16px;
+  }
+
+  .weather .recipe_card h3 {
+    font-size: 19px;
+  }
+
+  .weather .recipe_description {
+    font-size: 16px;
+  }
+
+  .weather {
+    padding-bottom: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .weather .weather_heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .weather .weather_badge {
+    flex: auto;
+    align-self: start;
+    min-width: 190px;
+    padding: 10px 16px;
+  }
+
+  .weather .three_columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .weather .recipe_card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .weather .recipe_card h3 {
+    font-size: 20px;
+  }
+
+  .weather .ingredients {
+    margin-top: 16px;
+  }
+}
