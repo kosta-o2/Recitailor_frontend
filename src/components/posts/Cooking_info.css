@@ -1,10 +1,18 @@
-.info {
-  background-color: #f8f6f5;
+.cooking_info {
+  background-color: var(--bg-secondary);
+  border: 1px solid red;
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-.info .title {
-  color: #7a8582;
+.infotitle {
+  color: var(--text-primary);
+  font-size: 12pt;
+  margin-bottom: 5px;
 }
-.info .info {
+.info {
   color: #283533;
+  font-size: 11pt;
 }

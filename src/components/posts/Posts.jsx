@@ -2,7 +2,9 @@ import { useState } from "react";
 import Cooking_info from "./Cooking_info";
 import Ingredient from "./Ingredient";
 import "./Posts.css";
-import { mococo } from "../../assets/mococo.jpg";
+import defaultImage from "../../assets/images/defaultImage.png";
+import Recipe from "./Recipe";
+
 /*{
 	id: ,//index번호로 primary key
 	title:, //제목
@@ -24,9 +26,11 @@ import { mococo } from "../../assets/mococo.jpg";
 }*/
 
 function Posts({ props }) {
-  const [visible, setVisible] = useState(false);
+  const [ingreVisible, setIngreVisible] = useState(false);
+  const [recipeVisible, setRecipeVisible] = useState(false);
   const {
     id,
+    imgurl = defaultImage,
     title,
     content,
     portion,
@@ -39,41 +43,48 @@ function Posts({ props }) {
     update_at,
   } = props;
 
+  const visible = (isVisible) => {
+    return isVisible ? <p>△</p> : <p>▽</p>;
+  };
   return (
     <div className="posts">
       <div>게시글생성</div>
-      <div className="post header">
-        <img url={mococo} alt="" />
+      <div className="header">
+        <div>
+          <img src={imgurl} alt="대표이미지" />
+        </div>
         <div className="head">
           <div className="title">{title}</div>
           <div className="content">{content}</div>
           <div className="info">
-            <Cooking_info title="조리 시간" info={time} />
+            <Cooking_info title="조리 시간" info={time + "분"} />
             <Cooking_info title="인원 수" info={portion} />
+            <Cooking_info title="조리 방법" info={category.method} />
+            <Cooking_info title="조리 종류" info={category.type} />
           </div>
         </div>
       </div>
 
       <hr />
-
+      {/* 재료 */}
       <div
         className="ingredient"
         onClick={() => {
-          setVisible(!visible);
+          setIngreVisible(!ingreVisible);
         }}
       >
-        <div className="ingredient header">
-          <div className="ingredient con">
+        <div className="postInfoHeader">
+          <div className="postInfoCon">
             <p>재료</p>
             {"  "}
-            <p className="count">
+            <p className="postInfoCount">
               {all_ingredient.ingredients.length + all_ingredient.sauces.length}
               개
             </p>
           </div>
-          {visible ? <p>▷</p> : <p>▽</p>}
+          {visible(ingreVisible)}
         </div>
-        {visible ? (
+        {ingreVisible ? (
           <div className="ingredients">
             <Ingredient ingredients={all_ingredient.ingredients} />
             <Ingredient sauces={all_ingredient.sauces} />
@@ -81,6 +92,24 @@ function Posts({ props }) {
         ) : (
           ""
         )}
+      </div>
+
+      <hr />
+      {/* 레시피 */}
+      <div
+        className="recipe"
+        onClick={() => {
+          setRecipeVisible(!recipeVisible);
+        }}
+      >
+        <div className="postInfoHeader">
+          <div className="postInfoCon">
+            <p>레시피</p>
+            <p className="postInfoCount">{recipes.length}단계</p>
+          </div>
+          {visible(recipeVisible)}
+        </div>
+        {recipeVisible ? <Recipe recipe={recipes} /> : ""}
       </div>
     </div>
   );

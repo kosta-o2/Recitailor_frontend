@@ -2,25 +2,51 @@
   background-color: var(--bg-page);
   border: 0px solid var(--border-default);
 }
+.header {
+  display: flex;
+  flex-direction: row;
+}
+img {
+  width: 30%;
+}
+.head {
+  margin-left: 20px;
+}
 .title {
+  color: var(--text-primary);
   font-size: 23pt;
 }
-
+.content {
+  color: var(--text-secondary);
+  font-size: 12pt;
+  margin: 20px 0;
+}
+.info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
 /* 재료 */
-.ingredient .header {
+.postInfoHeader {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding: 15px;
 }
-.ingredient .con {
+.postInfoCon {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
-.ingredient .con > p {
+.postInfoCon > p {
   font-size: 12pt;
+  margin-left: 20px;
 }
-.count {
+.postInfoCount {
   background-color: var(--color-accent);
+  border-radius: 10px;
+  padding: 10px;
 }
 .ingredients {
   display: flex;
