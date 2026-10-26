@@ -1,0 +1,99 @@
+.footer {
+  background-color: var(--logo-primary);
+  color: var(--text-inverse, #ffffff);
+}
+
+.footer .inner {
+  box-sizing: border-box;
+  max-width: 1320px;
+  min-height: 181px;
+  margin: 0 auto;
+  padding: 36px 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.footer .brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer .logo {
+  color: inherit;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.footer .tagline {
+  margin: 12px 0 0;
+  color: rgb(255 255 255 / 86%);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.footer .copyright {
+  margin-top: 36px;
+  color: rgb(255 255 255 / 68%);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.footer .services {
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.footer .title {
+  margin: 0 0 8px;
+  color: rgb(255 255 255 / 65%);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.footer .list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer .link {
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+  .footer .inner {
+    flex-direction: column;
+    padding: 32px 20px;
+    gap: 28px;
+  }
+
+  .footer .copyright {
+    margin-top: 24px;
+  }
+
+  .footer .services {
+    width: 100%;
+  }
+}

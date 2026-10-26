@@ -1,0 +1,111 @@
+.how_to {
+  padding-block: 38px 62px;
+  border-top: 1px solid var(--border-default, #e0e0e0);
+}
+
+.how_to .three_columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  padding: 0;
+  margin: 44px 0 0;
+  list-style: none;
+}
+
+.how_to .step_card {
+  min-width: 0;
+  padding: 20px 28px 24px;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 16px;
+  background: var(--bg-surface, #ffffff);
+}
+
+.how_to .step_card h3 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+}
+
+.how_to .step_number {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--color-primary, #216b65);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.how_to .step_card p {
+  margin: 14px 0 20px;
+  color: var(--text-secondary, #444444);
+  font-size: 22px;
+  line-height: 1.8;
+}
+
+@media (max-width: 1399px) {
+  .how_to .step_card p {
+    font-size: 18px;
+  }
+
+  .how_to .step_card {
+    padding: 20px;
+  }
+
+  .how_to .step_card h3 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .how_to .three_columns {
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .how_to .step_card {
+    padding: 18px 16px;
+  }
+
+  .how_to .step_card h3 {
+    font-size: 19px;
+  }
+
+  .how_to .step_card p {
+    font-size: 16px;
+  }
+
+  .how_to .step_card p {
+    margin-bottom: 0;
+  }
+
+  .how_to {
+    padding-block: 32px 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .how_to .three_columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .how_to .step_card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .how_to .step_card h3 {
+    font-size: 20px;
+  }
+
+  .how_to .step_number {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .how_to .step_card p {
+    margin-top: 10px;
+  }
+}
