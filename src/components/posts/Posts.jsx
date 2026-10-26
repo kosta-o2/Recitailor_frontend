@@ -4,6 +4,7 @@ import Ingredient from "./Ingredient";
 import "./Posts.css";
 import defaultImage from "../../assets/images/defaultImage.png";
 import Recipe from "./Recipe";
+import PostList from "./PostList";
 
 /*{
 	id: ,//index번호로 primary key
@@ -48,6 +49,8 @@ function Posts({ props }) {
   };
   return (
     <div className="posts">
+      <PostList />
+      <hr />
       <div>게시글생성</div>
       <div className="header">
         <div>
