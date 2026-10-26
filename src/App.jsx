@@ -44,10 +44,10 @@ function App() {
   console.log(mockdata);
   return (
     <>
-      {/* <Header /> */}
+      <Header />
       <Posts props={mockdata} />
       {/* <Outlet /> */}
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 }
