@@ -2,9 +2,9 @@
   background-color: #f8f6f5;
   border-radius: 10px;
 }
-.info > .title {
+.info .title {
   color: #7a8582;
 }
-.info > .info {
+.info .info {
   color: #283533;
 }

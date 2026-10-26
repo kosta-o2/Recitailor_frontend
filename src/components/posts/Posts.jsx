@@ -2,6 +2,7 @@ import { useState } from "react";
 import Cooking_info from "./Cooking_info";
 import Ingredient from "./Ingredient";
 import "./Posts.css";
+import { mococo } from "../../assets/mococo.jpg";
 /*{
 	id: ,//index번호로 primary key
 	title:, //제목
@@ -42,7 +43,7 @@ function Posts({ props }) {
     <div className="posts">
       <div>게시글생성</div>
       <div className="post header">
-        {/* <img src="" alt="" /> */}
+        <img url={mococo} alt="" />
         <div className="head">
           <div className="title">{title}</div>
           <div className="content">{content}</div>
@@ -52,21 +53,30 @@ function Posts({ props }) {
           </div>
         </div>
       </div>
+
       <hr />
-      <div className="ingredient">
-        <div
-          className="ingredient header"
-          onClick={() => {
-            setVisible(!visible);
-          }}
-        >
-          <p>재료</p>
+
+      <div
+        className="ingredient"
+        onClick={() => {
+          setVisible(!visible);
+        }}
+      >
+        <div className="ingredient header">
+          <div className="ingredient con">
+            <p>재료</p>
+            {"  "}
+            <p className="count">
+              {all_ingredient.ingredients.length + all_ingredient.sauces.length}
+              개
+            </p>
+          </div>
           {visible ? <p>▷</p> : <p>▽</p>}
         </div>
         {visible ? (
-          <div>
-            <Ingredient props={all_ingredient.ingredients} />
-            <Ingredient props={all_ingredient.sauces} />
+          <div className="ingredients">
+            <Ingredient ingredients={all_ingredient.ingredients} />
+            <Ingredient sauces={all_ingredient.sauces} />
           </div>
         ) : (
           ""

@@ -1,11 +1,29 @@
 .posts {
-  background-color: #fafafa;
-  border: 0px solid #e0e0e0;
+  background-color: var(--bg-page);
+  border: 0px solid var(--border-default);
 }
 .title {
   font-size: 23pt;
 }
 
 /* 재료 */
-.ingredient {
+.ingredient .header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.ingredient .con {
+  display: flex;
+  flex-direction: row;
+}
+.ingredient .con > p {
+  font-size: 12pt;
+}
+.count {
+  background-color: var(--color-accent);
+}
+.ingredients {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
