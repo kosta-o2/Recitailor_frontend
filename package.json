@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test:server": "node --test server/auth.test.cjs",
     "reset-token": "node server/scripts/create-reset-token.cjs",
-    "server": "npx json-server --watch db.json --port 4000",
+    "server": "node server/server.cjs",
     "start": "concurrently \"npm run dev\" \"npm run server\""
   },
   "dependencies": {

@@ -13,9 +13,9 @@ export async function signup({ id, nickname, email, password }) {
 }
 
 // 로그인
-export async function login({ email, password }) {
+export async function login({ id, password }) {
   const { data } = await api.post("/auth/login", {
-    email,
+    id,
     password,
   });
 

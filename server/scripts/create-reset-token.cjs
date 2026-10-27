@@ -19,7 +19,7 @@ function main() {
     throw new Error("사용법: npm run reset-token -- test@example.com");
   }
 
-  const dbPath = path.join(__dirname, "../db.json");
+  const dbPath = path.join(__dirname, "../../db.json");
   const db = JSON.parse(fs.readFileSync(dbPath, "utf8"));
 
   if (!Array.isArray(db.members)) {

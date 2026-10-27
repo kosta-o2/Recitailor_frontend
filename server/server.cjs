@@ -14,11 +14,11 @@ if (!process.env.JWT_SECRET) {
 
 const server = jsonServer.create();
 
-// server/db.json 연결
-const dataRouter = jsonServer.router(path.join(__dirname, "db.json"));
+// 프로젝트 루트의 db.json 연결
+const dataRouter = jsonServer.router(path.join(__dirname, "../db.json"));
 
 if (!Array.isArray(dataRouter.db.get("members").value())) {
-  throw new Error('server/db.json에 "members": []를 설정해주세요.');
+  throw new Error('db.json에 "members": []를 설정해주세요.');
 }
 
 server.use(jsonServer.defaults());

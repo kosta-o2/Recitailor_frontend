@@ -1,15 +1,28 @@
 import api from "./axios";
 
 const endpoint = "/recipes";
-// 회원 목록 조회
+// 레시피 목록 조회 (JSON Server 0.17 페이지 응답)
 export async function getPostbyPage(page) {
-  const { data } = await api.get(endpoint, {
+  const currentPage = Math.max(1, Number(page) || 1);
+  const limit = 8;
+  const { data, headers } = await api.get(endpoint, {
     params: {
-      _page: page,
-      _per_page: 8,
+      _page: currentPage,
+      _limit: limit,
     },
   });
-  return data;
+  const items = Number(headers["x-total-count"]);
+  const pages = Math.ceil(items / limit);
+
+  return {
+    data,
+    first: 1,
+    items,
+    last: pages,
+    next: currentPage < pages ? currentPage + 1 : null,
+    pages,
+    prev: currentPage > 1 ? currentPage - 1 : null,
+  };
 }
 
 // 게시글 정보 조회
