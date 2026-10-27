@@ -74,7 +74,7 @@
 }
 
 .hero .search_input::placeholder {
-  color: var(--text-서브색2, #767676);
+  color: var(--text-tertiary, #767676);
   opacity: 1;
 }
 
