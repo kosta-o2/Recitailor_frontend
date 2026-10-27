@@ -7,6 +7,11 @@ import Post from "./components/posts/Post.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import PostList from "./components/posts/PostList.jsx";
 import PostLayout from "./pages/PostLayout.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import FindIdPage from "./pages/FindIdPage.jsx";
+import FindPasswordPage from "./pages/FindPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,6 +27,11 @@ const router = createBrowserRouter([
           { path: ":id", element: <Post /> },
         ],
       },
+      { path: "login", element: <LoginPage /> },
+      { path: "signup", element: <SignupPage /> },
+      { path: "find-id", element: <FindIdPage /> },
+      { path: "find-password", element: <FindPasswordPage /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
       { path: "*", element: <NotFound /> },
     ],
   },

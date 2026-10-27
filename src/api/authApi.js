@@ -12,10 +12,10 @@ export async function signup({ id, nickname, email, password }) {
   return data;
 }
 
-// 로그인
-export async function login({ email, password }) {
+// 로그인 (아이디 + 비밀번호)
+export async function login({ id, password }) {
   const { data } = await api.post("/auth/login", {
-    email,
+    id,
     password,
   });
 
