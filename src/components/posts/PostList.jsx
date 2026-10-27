@@ -1,16 +1,46 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./PostList.css";
 import db from "../../../db.json";
 import search from "../../assets/images/search.svg";
 import SortButton from "./postUtil/sortButton";
 import ViewList from "./ViewList";
 import Image from "./postUtil/Image";
+import { getPostbyPage } from "../../api/recipePostApi";
 function PostList() {
   const [inputBox, setInputBox] = useState("");
   const sortList = ["전체", "최신순", "좋아요 순"];
   const inputRef = useRef();
   const sortRef = useRef();
-  // console.log(db.recipes);
+
+  const [response, setResponse] = useState();
+  const [view, SetView] = useState(0);
+
+  useEffect(() => {
+    const callPageDate = async (view) => {
+      // data, first, items, last, next, pages, prev
+      const res = await getPostbyPage(view);
+      setResponse(await res);
+    };
+    callPageDate(view);
+  }, [view]);
+
+  //숫자 보여주기
+  const ViewNumber = () => {
+    const result = [];
+    for (let index = 1; index <= response?.last; index++) {
+      result.push(
+        <div
+          key={index}
+          onClick={() => {
+            SetView(index);
+          }}
+        >
+          {index}
+        </div>,
+      );
+    }
+    return result;
+  };
   return (
     <div>
       <p>레시피게시판</p>
@@ -55,7 +85,8 @@ function PostList() {
           좋아요순
         </button>
       </div>
-      <ViewList data={db.recipes} />
+      {ViewNumber()}
+      <ViewList data={response?.data} />
       <div></div>
     </div>
   );
