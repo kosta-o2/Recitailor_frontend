@@ -69,7 +69,7 @@ function ViewList({ data }) {
               <hr style={{ width: "95%" }} />
               <div className="simplePostInfos">
                 <Image src={Time} alt="조리시간" name="simplePostInfoImg" />
-                <div className="simplePostInfo">{value.time}</div>
+                <div className="simplePostInfo">{value.time}분</div>
 
                 <Image src={People} alt="인원수" name="simplePostInfoImg" />
                 <div className="simplePostInfo">{value.portion}</div>

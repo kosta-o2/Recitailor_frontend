@@ -2,7 +2,7 @@ import "./App.css";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import { Outlet } from "react-router";
-import Posts from "./components/posts/Posts";
+import Posts from "./components/posts/Post";
 function App() {
   const mockdata = {
     id: 1,

@@ -3,8 +3,10 @@ import "./index.css";
 import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import NotFound from "./pages/NotFound.jsx";
-import Posts from "./components/posts/Posts.jsx";
+import Post from "./components/posts/Post.jsx";
 import MainPage from "./pages/MainPage.jsx";
+import PostList from "./components/posts/PostList.jsx";
+import PostLayout from "./components/posts/postLayout.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -12,7 +14,15 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "posts", element: <Posts /> },
+      {
+        path: "post",
+        element: <PostLayout />,
+        children: [
+          { index: true, element: <PostList /> },
+          { path: "post/:id", element: <Post /> },
+        ],
+      },
+      { path: "*", element: <NotFound /> },
     ],
   },
 ]);

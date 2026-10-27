@@ -10,7 +10,7 @@ function PostList() {
   const sortList = ["전체", "최신순", "좋아요 순"];
   const inputRef = useRef();
   const sortRef = useRef();
-
+  // console.log(db.recipes);
   return (
     <div>
       <p>레시피게시판</p>
@@ -55,7 +55,7 @@ function PostList() {
           좋아요순
         </button>
       </div>
-      <ViewList data={db} />
+      <ViewList data={db.recipes} />
       <div></div>
     </div>
   );

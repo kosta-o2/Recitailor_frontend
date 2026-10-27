@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Cooking_info from "./Cooking_info";
 import Ingredient from "./Ingredient";
-import "./Posts.css";
+import "./Post.css";
 import Recipe from "./Recipe";
 import PostList from "./PostList";
 import Image from "./postUtil/Image";
