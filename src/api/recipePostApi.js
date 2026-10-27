@@ -4,7 +4,7 @@ const endpoint = "/recipes";
 // 레시피 목록 조회 (JSON Server 0.17 페이지 응답)
 export async function getPostbyPage(page) {
   const currentPage = Math.max(1, Number(page) || 1);
-  const limit = 8;
+  const limit = 3;
   const { data, headers } = await api.get(endpoint, {
     params: {
       _page: currentPage,

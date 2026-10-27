@@ -6,7 +6,7 @@ function Recipe({ recipe }) {
       {recipe.map((value, index) => {
         return (
           <div key={index}>
-            <div>{index}단계</div>
+            <div>{index + 1}단계</div>
             <div>{value}</div>
           </div>
         );
