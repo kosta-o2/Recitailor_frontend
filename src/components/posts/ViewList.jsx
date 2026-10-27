@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./ViewList.css";
 import Image from "./postUtil/Image";
-
+import Time from "../../assets/images/Time.svg";
+import People from "../../assets/images/People.svg";
 function ViewList({ data }) {
   const VIEW_A_PAGE = 8; //한페이지에 보여질 갯 수
   const TOTAL_PAGES = parseInt(data.length / VIEW_A_PAGE) + 1; //페이지 갯수
@@ -41,7 +42,7 @@ function ViewList({ data }) {
   }, [isView]);
 
   const gridClickEvent = (value) => {
-    console.log(value); //
+    console.log(value); //TODO nav이동으로 /:id
   };
 
   return (
@@ -67,7 +68,10 @@ function ViewList({ data }) {
               <div className="simplePostTitle">{value.title}</div>
               <hr style={{ width: "95%" }} />
               <div className="simplePostInfos">
+                <Image src={Time} alt="조리시간" name="simplePostInfoImg" />
                 <div className="simplePostInfo">{value.time}</div>
+
+                <Image src={People} alt="인원수" name="simplePostInfoImg" />
                 <div className="simplePostInfo">{value.portion}</div>
               </div>
             </div>
