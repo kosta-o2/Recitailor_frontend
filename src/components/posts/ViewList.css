@@ -1,0 +1,38 @@
+.girdList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.girdList > div {
+  border: 1px solid var(--border-default);
+  padding: 8px;
+}
+.simplePostImg {
+  width: 100%;
+  border-radius: 10px;
+}
+.simplePostType {
+  background-color: var(--color-accent);
+  border-radius: 20px;
+  width: 10%;
+  display: flex;
+  padding: 5px;
+  justify-content: center;
+}
+.simplePostInfos {
+  display: flex;
+  flex-direction: row;
+  margin-left: 8px;
+  gap: 0px 8px;
+}
+.simplePostInfo {
+  font-size: 8pt;
+  justify-self: center;
+}
+
+.pageNumber {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}

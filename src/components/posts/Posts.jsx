@@ -2,9 +2,9 @@ import { useState } from "react";
 import Cooking_info from "./Cooking_info";
 import Ingredient from "./Ingredient";
 import "./Posts.css";
-import defaultImage from "../../assets/images/defaultImage.png";
 import Recipe from "./Recipe";
 import PostList from "./PostList";
+import Image from "./postUtil/Image";
 
 /*{
 	id: ,//index번호로 primary key
@@ -31,7 +31,7 @@ function Posts({ props }) {
   const [recipeVisible, setRecipeVisible] = useState(false);
   const {
     id,
-    imgurl = defaultImage,
+    img_url,
     title,
     content,
     portion,
@@ -54,7 +54,7 @@ function Posts({ props }) {
       <div>게시글생성</div>
       <div className="header">
         <div>
-          <img src={imgurl} alt="대표이미지" />
+          <Image src={img_url} alt="대표이미지" />
         </div>
         <div className="head">
           <div className="title">{title}</div>
