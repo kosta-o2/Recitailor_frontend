@@ -1,0 +1,6 @@
+li {
+  color: --color-accent;
+}
+li > p {
+  color: --text-primary;
+}

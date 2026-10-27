@@ -1,33 +1,34 @@
 import React from "react";
 import styles from "./Header.module.css";
 import logo from "../../assets/images/logo.png";
+import { Link } from "react-router";
 
 function Header() {
   return (
     <div className={styles.header}>
       <div className={styles.inner}>
-        <a href="/" className={styles.logo}>
+        <Link to="/" className={styles.logo}>
           <img src={logo} alt="" className={styles.logo_image} />
           <span className={styles.logo_text}>recitailor</span>
-        </a>
+        </Link>
         <nav>
-          <a href="recipes/search" className={styles.link}>
+          <Link to="recipes/search" className={styles.link}>
             AI 레시피 검색
-          </a>
-          <a href="recipes/search" className={styles.link}>
+          </Link>
+          <Link to="recipes/search" className={styles.link}>
             AI 레시피 생성
-          </a>
-          <a href="recipes/search" className={styles.link}>
+          </Link>
+          <Link to="/post" className={styles.link}>
             사용자 레시피
-          </a>
+          </Link>
         </nav>
         <div className={styles.account}>
-          <a href="/login" className={styles.link}>
+          <Link to="/login" className={styles.link}>
             로그인
-          </a>
-          <a href="/mypage" className={styles.link}>
+          </Link>
+          <Link to="/mypage" className={styles.link}>
             마이페이지
-          </a>
+          </Link>
         </div>
       </div>
     </div>
