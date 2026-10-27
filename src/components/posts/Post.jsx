@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cooking_info from "./Cooking_info";
 import Ingredient from "./Ingredient";
 import "./Post.css";
 import Recipe from "./Recipe";
 import PostList from "./PostList";
 import Image from "./postUtil/Image";
+import { useParams } from "react-router";
+import { getPostbyId } from "../../api/recipePostApi";
 
 /*{
 	id: ,//index번호로 primary key
@@ -26,9 +28,20 @@ import Image from "./postUtil/Image";
 	update_at:"" //수정일자
 }*/
 
-function Posts({ props }) {
+function Post() {
+  const paramsId = useParams().id;
   const [ingreVisible, setIngreVisible] = useState(false);
   const [recipeVisible, setRecipeVisible] = useState(false);
+  const [post, setPost] = useState([]);
+
+  useEffect(() => {
+    const getDetail = async (params) => {
+      const res = await getPostbyId(params);
+      // console.log(res);
+      setPost(res);
+    };
+    getDetail(paramsId);
+  }, [paramsId]);
   const {
     id,
     img_url,
@@ -42,80 +55,102 @@ function Posts({ props }) {
     recipes,
     create_at,
     update_at,
-  } = props;
-
+  } = post;
   const visible = (isVisible) => {
     return isVisible ? <p>△</p> : <p>▽</p>;
   };
   return (
-    <div className="posts">
-      <PostList />
-      <hr />
-      <div>게시글생성</div>
-      <div className="header">
-        <div>
-          <Image src={img_url} alt="대표이미지" />
-        </div>
-        <div className="head">
-          <div className="title">{title}</div>
-          <div className="content">{content}</div>
-          <div className="info">
-            <Cooking_info title="조리 시간" info={time + "분"} />
-            <Cooking_info title="인원 수" info={portion} />
-            <Cooking_info title="조리 방법" info={category.method} />
-            <Cooking_info title="조리 종류" info={category.type} />
+    <>
+      {post ? (
+        <div className="posts">
+          <div>게시글생성</div>
+          <div className="header">
+            <div>
+              <Image src={img_url} alt="대표이미지" />
+            </div>
+            <div className="head">
+              <div className="title">{title}</div>
+              <div className="content">{content}</div>
+              <div className="info">
+                <Cooking_info title="조리 시간" info={time + "분"} />
+                <Cooking_info title="인원 수" info={portion} />
+                {category ? (
+                  <>
+                    <Cooking_info title="조리 방법" info={category?.method} />
+                    <Cooking_info title="조리 종류" info={category?.type} />
+                  </>
+                ) : (
+                  ""
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <hr />
-      {/* 재료 */}
-      <div
-        className="ingredient"
-        onClick={() => {
-          setIngreVisible(!ingreVisible);
-        }}
-      >
-        <div className="postInfoHeader">
-          <div className="postInfoCon">
-            <p>재료</p>
-            {"  "}
-            <p className="postInfoCount">
-              {all_ingredient.ingredients.length + all_ingredient.sauces.length}
-              개
-            </p>
+          <hr />
+          {/* 재료 */}
+          <div
+            className="ingredient"
+            onClick={() => {
+              setIngreVisible(!ingreVisible);
+            }}
+          >
+            {all_ingredient ? (
+              <>
+                <div className="postInfoHeader">
+                  <div className="postInfoCon">
+                    <p>재료</p>
+                    {"  "}
+                    <p className="postInfoCount">
+                      {all_ingredient.ingredients.length +
+                        all_ingredient.sauces.length}
+                      개
+                    </p>
+                  </div>
+                  {visible(ingreVisible)}
+                </div>
+                {ingreVisible ? (
+                  <div className="ingredients">
+                    <Ingredient ingredients={all_ingredient.ingredients} />
+                    <Ingredient sauces={all_ingredient.sauces} />
+                  </div>
+                ) : (
+                  ""
+                )}
+              </>
+            ) : (
+              ""
+            )}
           </div>
-          {visible(ingreVisible)}
-        </div>
-        {ingreVisible ? (
-          <div className="ingredients">
-            <Ingredient ingredients={all_ingredient.ingredients} />
-            <Ingredient sauces={all_ingredient.sauces} />
-          </div>
-        ) : (
-          ""
-        )}
-      </div>
 
-      <hr />
-      {/* 레시피 */}
-      <div
-        className="recipe"
-        onClick={() => {
-          setRecipeVisible(!recipeVisible);
-        }}
-      >
-        <div className="postInfoHeader">
-          <div className="postInfoCon">
-            <p>레시피</p>
-            <p className="postInfoCount">{recipes.length}단계</p>
+          <hr />
+          {/* 레시피 */}
+          <div
+            className="recipe"
+            onClick={() => {
+              setRecipeVisible(!recipeVisible);
+            }}
+          >
+            {recipes ? (
+              <>
+                <div className="postInfoHeader">
+                  <div className="postInfoCon">
+                    <p>레시피</p>
+                    <p className="postInfoCount">{recipes.length}단계</p>
+                  </div>
+                  {visible(recipeVisible)}
+                </div>
+                {recipeVisible ? <Recipe recipe={recipes} /> : ""}
+              </>
+            ) : (
+              ""
+            )}
           </div>
-          {visible(recipeVisible)}
         </div>
-        {recipeVisible ? <Recipe recipe={recipes} /> : ""}
-      </div>
-    </div>
+      ) : (
+        ""
+      )}
+    </>
   );
 }
 
-export default Posts;
+export default Post;

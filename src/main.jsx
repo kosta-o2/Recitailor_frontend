@@ -19,7 +19,7 @@ const router = createBrowserRouter([
         element: <PostLayout />,
         children: [
           { index: true, element: <PostList /> },
-          { path: "post/:id", element: <Post /> },
+          { path: ":id", element: <Post /> },
         ],
       },
       { path: "*", element: <NotFound /> },
