@@ -8,9 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "node server/server.cjs",
     "test:server": "node --test server/auth.test.cjs",
     "reset-token": "node server/scripts/create-reset-token.cjs",
+    "server": "npx json-server --watch db.json --port 4000",
     "start": "concurrently \"npm run dev\" \"npm run server\""
   },
   "dependencies": {

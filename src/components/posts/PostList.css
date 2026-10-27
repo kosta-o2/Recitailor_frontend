@@ -1,0 +1,38 @@
+.searchBox {
+  border: 1px var(--border-default) solid;
+  border-radius: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+.searchLine {
+}
+.searchLine > img {
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+}
+.searchLine > input {
+  font-size: 9pt;
+  padding: 10px 20px 10px 5px;
+  margin: 0px 20px;
+}
+.searchBox > p {
+  padding-right: 10px;
+}
+
+.sorts {
+  /* display: inline-flex; */
+}
+.sortList {
+  background-color: var(--bg-secondary);
+  border: 1px red solid;
+  margin: 0px 20px;
+  padding: 5px;
+  border-radius: 30px;
+}
+.sortList:focus {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
