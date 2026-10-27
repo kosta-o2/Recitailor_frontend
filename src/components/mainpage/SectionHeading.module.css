@@ -1,0 +1,53 @@
+.heading::before {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 5px;
+  margin-bottom: 8px;
+  border-radius: 3px;
+  background: var(--color-accent, #f4a477);
+}
+
+.heading h2 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+}
+
+.heading p {
+  margin: 10px 0 0;
+  color: var(--text-secondary, #444444);
+  font-size: 22px;
+}
+
+@media (max-width: 1399px) {
+  .heading h2 {
+    font-size: 28px;
+  }
+
+  .heading p {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .heading h2 {
+    font-size: 24px;
+  }
+
+  .heading p {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .heading h2 {
+    font-size: 23px;
+  }
+
+  .heading p {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,13 @@
+/* 1320px content width; the outer gutter does not reduce this width. */
+.container {
+  width: calc(100% - 64px);
+  max-width: 1320px;
+  margin-inline: auto;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .container {
+    width: calc(100% - 40px);
+  }
+}

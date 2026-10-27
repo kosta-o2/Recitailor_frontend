@@ -1,14 +1,17 @@
 :root {
   /* 배경 */
-  --bg-page: #fafafa;
+  --bg-page: hwb(0 98% 2%);
   --bg-header: #ffffff;
-  --bg-footer: #216b65;
+  --bg-footer: #003688;
   --bg-surface: #ffffff;
   --bg-secondary: #f8f8f8;
 
   /* 브랜드 */
-  --color-primary: #216b65;
+  --color-primary: #003688;
   --color-accent: #f4a477;
+
+  /* 로고 */
+  --logo-primary: #003688;
 
   /* 테두리 */
   --border-default: #e0e0e0;
