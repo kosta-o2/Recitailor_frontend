@@ -6,7 +6,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Post from "./components/posts/Post.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import PostList from "./components/posts/PostList.jsx";
-import PostLayout from "./components/posts/postLayout.jsx";
+import PostLayout from "./pages/PostLayout.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
