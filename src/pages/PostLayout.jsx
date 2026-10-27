@@ -2,11 +2,7 @@ import React from "react";
 import { Outlet } from "react-router";
 
 function PostLayout() {
-  return (
-    <div className="container">
-      <Outlet />
-    </div>
-  );
+  return <Outlet />;
 }
 
 export default PostLayout;
