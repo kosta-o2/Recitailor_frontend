@@ -9,12 +9,19 @@
   /* 브랜드 */
   --color-primary: #003688;
   --color-accent: #f4a477;
+  --color-accent-bar: #e8743b;
+
+  /* 상태 */
+  --color-error: #c2410c;
+  --color-success: #1f6b5c;
+  --bg-result: #f3f6fb;
 
   /* 로고 */
   --logo-primary: #003688;
 
   /* 테두리 */
   --border-default: #e0e0e0;
+  --border-input: #d4d7dc;
 
   /* 글자 */
   --text-primary: #222222;

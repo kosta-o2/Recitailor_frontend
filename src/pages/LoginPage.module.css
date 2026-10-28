@@ -1,0 +1,48 @@
+.login_options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--text-secondary, #444444);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.remember_checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--color-primary, #003688);
+}
+
+.find_links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.find_links a {
+  color: var(--text-tertiary, #767676);
+}
+
+.find_links a:hover {
+  color: var(--color-primary, #003688);
+}
+
+.find_links a:focus-visible {
+  outline: 2px solid var(--color-primary, #003688);
+  outline-offset: 2px;
+}
+
+.separator {
+  color: var(--border-input, #d4d7dc);
+}

@@ -1758,56 +1758,6 @@
   ],
   "members": [
     {
-      "id": "chef_01",
-      "password": "1234",
-      "nickname": "자취요리사",
-      "email": "1@gmail.com",
-      "status": "1",
-      "created_at": "2026-03-01T09:00:00Z",
-      "updated_at": "2026-03-01T09:00:00Z",
-      "deleted_at": ""
-    },
-    {
-      "id": "chef_02",
-      "password": "1234",
-      "nickname": "굿굿",
-      "email": "2@gmail.com",
-      "status": "1",
-      "created_at": "2026-03-01T09:00:00Z",
-      "updated_at": "2026-03-01T09:00:00Z",
-      "deleted_at": ""
-    },
-    {
-      "id": "chef_03",
-      "password": "1234",
-      "nickname": "냠냠",
-      "email": "3@gmail.com",
-      "status": "1",
-      "created_at": "2026-03-01T09:00:00Z",
-      "updated_at": "2026-03-01T09:00:00Z",
-      "deleted_at": ""
-    },
-    {
-      "id": "chef_04",
-      "password": "1234",
-      "nickname": "쩝쩝",
-      "email": "4@gmail.com",
-      "status": "1",
-      "created_at": "2026-03-01T09:00:00Z",
-      "updated_at": "2026-03-01T09:00:00Z",
-      "deleted_at": ""
-    },
-    {
-      "id": "chef_05",
-      "password": "1234",
-      "nickname": "굿데이",
-      "email": "5@gmail.com",
-      "status": "1",
-      "created_at": "2026-03-01T09:00:00Z",
-      "updated_at": "2026-03-01T09:00:00Z",
-      "deleted_at": ""
-    },
-    {
       "id": "111",
       "password": "$2b$12$36e2pwM/wP06l.Hk9FiZs.NvsHPrJX2R1CDg3382T4Ssuaxnt7Rby",
       "nickname": "111",
@@ -1818,13 +1768,23 @@
       "deleted_at": null
     },
     {
-      "id": "112",
-      "password": "$2b$12$KDCQZqhb8iH2GCSy8SeVWu9ZqFdoBZtMjioZC0lCDrH9icm/g9TBW",
-      "nickname": "112",
-      "email": "112@gmail.com",
+      "id": "tester01",
+      "password": "$2b$12$b.CCDfW8OjLDhujwFGeq0.Hu2JCbcqFqa4jzPkk1ji2vB4w5NffcW",
+      "nickname": "테스터",
+      "email": "tester01@test.com",
       "status": 1,
-      "created_at": "2026-10-27T09:30:57.811Z",
-      "updated_at": "2026-10-27T09:30:57.811Z",
+      "created_at": "2026-10-27T12:53:01.505Z",
+      "updated_at": "2026-10-27T12:53:30.798Z",
+      "deleted_at": null
+    },
+    {
+      "id": "rise",
+      "password": "$2b$12$gAUDHrGvTWL58KTCLW0keeRI.YoTgvfpYf1fTIyzY54f8OjMwVLd2",
+      "nickname": "rise",
+      "email": "rise@gmail.com",
+      "status": 1,
+      "created_at": "2026-10-27T12:55:46.447Z",
+      "updated_at": "2026-10-27T12:55:46.447Z",
       "deleted_at": null
     }
   ]

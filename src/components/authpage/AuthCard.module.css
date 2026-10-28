@@ -1,0 +1,20 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 0;
+  padding: 32px;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 16px;
+  background: var(--bg-surface, #ffffff);
+}
+
+.card_compact {
+  gap: 20px;
+}
+
+@media (max-width: 767px) {
+  .card {
+    padding: 24px 20px;
+  }
+}
