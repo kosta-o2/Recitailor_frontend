@@ -10,6 +10,11 @@ import PostLayout from "./pages/PostLayout.jsx";
 import { store } from "./app/store.js";
 import { Provider } from "react-redux";
 import PostCreate from "./components/posts/PostCreate.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import FindIdPage from "./pages/FindIdPage.jsx";
+import FindPasswordPage from "./pages/FindPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -26,6 +31,11 @@ const router = createBrowserRouter([
           { path: "create", element: <PostCreate /> },
         ],
       },
+      { path: "login", element: <LoginPage /> },
+      { path: "signup", element: <SignupPage /> },
+      { path: "find-id", element: <FindIdPage /> },
+      { path: "find-password", element: <FindPasswordPage /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
       { path: "*", element: <NotFound /> },
     ],
   },

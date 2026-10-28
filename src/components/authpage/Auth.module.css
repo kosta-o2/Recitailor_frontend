@@ -1,0 +1,102 @@
+/* 인증 페이지 공통 입력칸, 버튼, 메시지 */
+.input {
+  width: 100%;
+  min-width: 0;
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--border-input, #d4d7dc);
+  border-radius: 10px;
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #222222);
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.input::placeholder {
+  color: var(--text-tertiary, #767676);
+}
+
+.input:focus {
+  border-color: var(--color-primary, #003688);
+  outline: 2px solid var(--color-primary, #003688);
+  outline-offset: -1px;
+}
+
+.check_button {
+  flex: none;
+  height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--color-primary, #003688);
+  border-radius: 10px;
+  background: var(--bg-surface, #ffffff);
+  color: var(--color-primary, #003688);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.check_button:focus-visible {
+  outline: 2px solid var(--color-primary, #003688);
+  outline-offset: 2px;
+}
+
+.primary_button,
+.secondary_button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary_button {
+  height: 54px;
+  border: 0;
+  background: var(--color-primary, #003688);
+  color: var(--text-inverse, #ffffff);
+  font-size: 16px;
+}
+
+.primary_button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.secondary_button {
+  height: 52px;
+  border: 1px solid var(--border-input, #d4d7dc);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #222222);
+  font-size: 15px;
+}
+
+.secondary_button:hover {
+  border-color: var(--color-primary, #003688);
+}
+
+/* 폼의 주 버튼은 위 여백 4px을 더한다 */
+.submit {
+  margin-top: 4px;
+}
+
+.primary_button:focus-visible,
+.secondary_button:focus-visible {
+  outline: 2px solid var(--color-primary, #003688);
+  outline-offset: 2px;
+}
+
+.form_error {
+  margin: 0;
+  color: var(--color-error, #c2410c);
+  font-size: 14px;
+}
+
+.form_error a {
+  color: inherit;
+  font-weight: 700;
+}
