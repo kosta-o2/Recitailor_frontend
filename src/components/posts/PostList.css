@@ -1,3 +1,7 @@
+button {
+  border: none;
+  background-color: var(--bg-page);
+}
 .searchBox {
   border: 1px var(--border-default) solid;
   border-radius: 20px;

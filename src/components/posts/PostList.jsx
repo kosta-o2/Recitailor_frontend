@@ -8,39 +8,94 @@ import Image from "./postUtil/Image";
 import { getPostbyPage } from "../../api/recipePostApi";
 function PostList() {
   const [inputBox, setInputBox] = useState("");
-  const sortList = ["전체", "최신순", "좋아요 순"];
+  const sortList = ["기본", "최신 순", "좋아요 순"];
   const inputRef = useRef();
-  const sortRef = useRef();
 
   const [response, setResponse] = useState();
-  const [view, SetView] = useState(0);
 
-  useEffect(() => {
-    const callPageDate = async (view) => {
-      // data, first, items, last, next, pages, prev
-      const res = await getPostbyPage(view);
-      setResponse(await res);
-    };
-    callPageDate(view);
-  }, [view]);
-
-  //숫자 보여주기
+  const PAGE_GROUP_SIZE = 5;
+  const [currentPageGroup, setCurrentPageGroup] = useState(1); //현재  페이지 그룹
+  const lastPage = response?.last;
+  const pageGroup = Math.ceil(lastPage / PAGE_GROUP_SIZE); //페이지 그룹의 수
+  const [view, SetView] = useState(1); // 현재 페이지
+  //페이지 이동
   const ViewNumber = () => {
-    const result = [];
-    for (let index = 1; index <= response?.last; index++) {
-      result.push(
-        <div
+    const minPage = (currentPageGroup - 1) * PAGE_GROUP_SIZE + 1;
+    const maxPage =
+      currentPageGroup * PAGE_GROUP_SIZE < lastPage
+        ? currentPageGroup * PAGE_GROUP_SIZE
+        : lastPage;
+    const re = [];
+
+    re.push(
+      <button
+        key="first"
+        onClick={() => {
+          setCurrentPageGroup(1);
+        }}
+      >
+        〈〈
+      </button>,
+    );
+    re.push(
+      <button
+        key="pre"
+        onClick={() => {
+          setCurrentPageGroup(
+            currentPageGroup === 1 ? 1 : currentPageGroup - 1,
+          );
+        }}
+      >
+        〈
+      </button>,
+    );
+    for (let index = minPage; index <= maxPage; index++) {
+      re.push(
+        <button
           key={index}
           onClick={() => {
             SetView(index);
           }}
         >
           {index}
-        </div>,
+        </button>,
       );
     }
-    return result;
+    re.push(
+      <button
+        key="next"
+        onClick={() => {
+          setCurrentPageGroup(
+            currentPageGroup === pageGroup ? pageGroup : currentPageGroup + 1,
+          );
+        }}
+      >
+        〉
+      </button>,
+    );
+    re.push(
+      <button
+        key="end"
+        onClick={() => {
+          setCurrentPageGroup(pageGroup);
+        }}
+      >
+        〉〉
+      </button>,
+    );
+    return re;
   };
+
+  //해당하는 페이지에 맞게 데이터 호출
+  useEffect(() => {
+    const callPageDate = async (view) => {
+      // data, first, items, last, next, pages, prev
+      const res = await getPostbyPage(view);
+      setResponse(res);
+    };
+    callPageDate(view);
+  }, [view]);
+
   return (
     <div>
       <p>레시피게시판</p>
@@ -69,21 +124,11 @@ function PostList() {
       </div>
 
       <div className="sorts">
-        <button
-          className="sortList"
-          onClick={() => {
-            console.log(sortRef.current.ref);
-          }}
-          ref={sortRef}
-        >
-          전체
-        </button>
-        <button className="sortList" onClick={(e) => {}} ref={sortRef}>
-          최신순
-        </button>
-        <button className="sortList" onClick={(e) => {}} ref={sortRef}>
-          좋아요순
-        </button>
+        {sortList.map((value, index) => {
+          <button className="sortList" onClick={() => {}} key={value}>
+            {value}
+          </button>;
+        })}
       </div>
       {ViewNumber()}
       <ViewList data={response?.data} />
