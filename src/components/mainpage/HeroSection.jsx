@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./HeroSection.module.css";
 import HeroImage from "../../assets/images/hero-image.png";
-import { useAIRecipeInput } from "../../hooks/useAiRecipeInput";
+import { useAIRecipeInput } from "../../hooks/useAIRecipeInput";
 
 function HeroSection() {
   const {
