@@ -9,6 +9,7 @@ import PostList from "./components/posts/PostList.jsx";
 import PostLayout from "./pages/PostLayout.jsx";
 import { store } from "./app/store.js";
 import { Provider } from "react-redux";
+import PostCreate from "./components/posts/PostCreate.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <PostList /> },
           { path: ":id", element: <Post /> },
+          { path: "create", element: <PostCreate /> },
         ],
       },
       { path: "*", element: <NotFound /> },

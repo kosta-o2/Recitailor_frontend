@@ -6,8 +6,10 @@ import Image from "./postUtil/Image";
 import { getPostbyPage } from "../../api/recipePostApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setPage, setSort } from "../../features/postSlice";
+import { useNavigate } from "react-router";
 
 function PostList() {
+  const nav = useNavigate();
   const [inputBox, setInputBox] = useState("");
   const inputRef = useRef();
   const [response, setResponse] = useState();
@@ -128,9 +130,24 @@ function PostList() {
   };
 
   return (
-    <div>
-      <p>레시피게시판</p>
-      <p>다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.</p>
+    <div className="postList">
+      <div className="postHeader">
+        <div className="postHeaderText">
+          <p className="postTitle">레시피게시판</p>
+          <p className="postDescription">
+            다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="postCreateButton"
+          onClick={() => {
+            nav("/post/create");
+          }}
+        >
+          + 게시글 작성
+        </button>
+      </div>
       <div className="searchBox">
         <div className="searchLine">
           <Image src={search} alt="검색" />
@@ -171,7 +188,7 @@ function PostList() {
         })}
       </div>
       <ViewList data={response?.data} />
-      {ViewNumber()}
+      <div className="postPagination">{ViewNumber()}</div>
     </div>
   );
 }
