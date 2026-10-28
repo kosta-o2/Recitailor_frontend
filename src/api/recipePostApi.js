@@ -34,3 +34,7 @@ export async function getPostbyId(id) {
 
   return data;
 }
+export const createRecipePost = async (postData) => {
+  const response = await api.post(endpoint, postData);
+  return response.data;
+};

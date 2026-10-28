@@ -59,7 +59,7 @@ function ViewList({ data }) {
                 <div className="simplePostInfosAuthor">
                   <div className="simplePostInfo"> by {value.author} </div>
                   <div className="simplePostInfo">
-                    게시일: {value.create_at.slice(0, 10)}
+                    게시일: {value?.create_at?.slice(0, 10)}
                   </div>
                 </div>
               </div>

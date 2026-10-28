@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import "./PostCreate.css";
+import { createRecipePost } from "../../api/recipePostApi";
 
 // 조리 방식
 const METHOD_OPTIONS = [
@@ -46,6 +47,11 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const PostCreate = () => {
   const nav = useNavigate();
 
+  //수정되어야 하는것들///////
+  const nickname = "채재희";
+  const img_url = null;
+  /////////////////////////////////
+
   // 기본 정보
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -70,6 +76,8 @@ const PostCreate = () => {
   const [method, setMethod] = useState("");
   const [type, setType] = useState("");
 
+  //생성 연속 클릭 방지
+  const [isSubmitting, setIsSubmitting] = useState();
   // 이미지 미리보기 URL 관리
   useEffect(() => {
     if (!image) {
@@ -145,7 +153,7 @@ const PostCreate = () => {
   };
 
   // 레시피 등록
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validIngredients = ingredients
@@ -191,27 +199,47 @@ const PostCreate = () => {
       title: title.trim(),
       content: content.trim(),
       portion: portion.trim(),
+      author: nickname,
       time: time.trim() ? Number(time.trim()) : null,
-
       all_ingredient: {
         ingredients: validIngredients,
         sauces: validSauces,
       },
-
       category: {
         method,
         type,
       },
-
       recipes: validRecipes,
+      likes: 0,
+      img_url: img_url, //이미지 url구조 완성되어야한다.
+      create_at: new Date().toLocaleTimeString(),
+      update_at: new Date().toLocaleTimeString(),
     };
 
     console.log("등록할 게시글 객체:", recipeData);
     console.log("업로드 이미지:", image);
 
     // TODO: Axios POST 요청 연결
-    // recipeData와 image를 서버에 전송
-    nav("/post");
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await createRecipePost(recipeData);
+
+      console.log("게시글 생성 성공:", response);
+      alert("레시피가 등록되었습니다.");
+
+      nav("/post");
+    } catch (error) {
+      console.error("게시글 생성 실패:", error);
+
+      alert(
+        error.response?.data?.message || "게시글 등록 중 오류가 발생했습니다.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -506,8 +534,12 @@ const PostCreate = () => {
             취소
           </button>
 
-          <button type="submit" className="post-create-submit">
-            레시피 등록
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="post-create-submit"
+          >
+            {isSubmitting ? "등록 중..." : "레시피 등록"}
           </button>
         </div>
 
