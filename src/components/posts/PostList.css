@@ -1,42 +1,191 @@
-button {
-  border: none;
-  background-color: var(--bg-page);
-}
-.searchBox {
-  border: 1px var(--border-default) solid;
-  border-radius: 20px;
-  display: inline-flex;
-  justify-content: center;
+/* 레시피 게시판: PostList.jsx의 최상위 div만 대상으로 합니다. */
+div:has(> .searchBox):has(> .sorts) {
+  --post-list-green: #216e68;
+  --post-list-orange: #f5a477;
+  width: min(calc(100% - 48px), 1160px);
+  margin: 32px auto 56px;
+  padding: 34px 32px 44px;
+  box-sizing: border-box;
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
   align-items: center;
-}
-.searchLine {
-}
-.searchLine > img {
-  width: 20px;
-  height: 20px;
-  align-items: center;
-  justify-content: center;
-}
-.searchLine > input {
-  font-size: 9pt;
-  padding: 10px 20px 10px 5px;
-  margin: 0px 20px;
-}
-.searchBox > p {
-  padding-right: 10px;
+  gap: 0 8px;
+  color: var(--text-primary, #222);
 }
 
-.sorts {
-  /* display: inline-flex; */
+/* 제목, 설명 */
+div:has(> .searchBox):has(> .sorts) > p {
+  flex: 0 0 100%;
+  margin: 0;
 }
-.sortList {
-  background-color: var(--bg-secondary);
-  border: 1px red solid;
-  margin: 0px 20px;
-  padding: 5px;
-  border-radius: 30px;
+div:has(> .searchBox):has(> .sorts) > p:first-child {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-bottom: 8px;
 }
-.sortList:focus {
-  background-color: var(--color-primary);
-  color: var(--text-inverse);
+div:has(> .searchBox):has(> .sorts) > p:nth-child(2) {
+  color: var(--text-tertiary, #767676);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* 검색 */
+div:has(> .searchBox):has(> .sorts) > .searchBox {
+  order: 1;
+  flex: 0 0 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+.searchBox:focus-within {
+  border-color: var(--color-primary, #003688) !important;
+}
+.searchLine {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 10px;
+}
+.searchLine > img,
+.searchLine img {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.searchLine > input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 0;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-primary, #222);
+}
+.searchLine > input::placeholder {
+  color: #9aa3a1;
+}
+.searchBox > p {
+  margin: 0;
+  padding: 6px;
+  cursor: pointer;
+  color: #8a9592;
+  font-size: 12px;
+  user-select: none;
+}
+
+/* 정렬 버튼: 기존 JSX에 실제로 존재하는 3개만 표시 */
+div:has(> .searchBox):has(> .sorts) > .sorts {
+  order: 2;
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.sorts > .sortList {
+  min-width: 85px;
+  height: 34px;
+  padding: 0 16px;
+  margin: 0;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-secondary, #444);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.sorts > .sortList:hover {
+  border-color: var(--post-list-green, #216e68);
+}
+.sorts > .sortList:focus {
+  background: var(--post-list-green, #216e68);
+  color: white;
+  border-color: var(--post-list-green, #216e68);
+}
+.sorts > .sortList:focus-visible {
+  outline: 2px solid var(--post-list-green, #216e68);
+  outline-offset: 2px;
+}
+
+/* JSX에 별도 래퍼 없이 생성되는 페이지 이동 버튼 */
+div:has(> .searchBox):has(> .sorts) > button {
+  order: 5;
+  flex: 0 0 30px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  margin: 20px 0 0;
+  background: transparent;
+  color: var(--text-tertiary, #767676);
+  font-size: 12px;
+  cursor: pointer;
+}
+div:has(> .searchBox):has(> .sorts) > button:first-of-type {
+  margin-left: auto;
+}
+div:has(> .searchBox):has(> .sorts) > button:last-of-type {
+  margin-right: auto;
+}
+div:has(> .searchBox):has(> .sorts) > button:hover:not(:disabled) {
+  color: var(--post-list-green, #216e68);
+  background: #edf5f3;
+}
+div:has(> .searchBox):has(> .sorts) > button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+div:has(> .searchBox):has(> .sorts) > button:focus-visible {
+  outline: 2px solid var(--post-list-green, #216e68);
+}
+
+/* 카드 목록이 페이지 번호보다 먼저 보이도록 배치 (DOM 변경 없음) */
+div:has(> .searchBox):has(> .sorts) > .girdList {
+  order: 4;
+  flex: 0 0 100%;
+  min-width: 0;
+}
+div:has(> .searchBox):has(> .sorts) > div:last-child:empty {
+  order: 6;
+  flex: 0 0 100%;
+}
+
+@media (max-width: 700px) {
+  div:has(> .searchBox):has(> .sorts) {
+    width: calc(100% - 24px);
+    margin: 16px auto 32px;
+    padding: 24px 18px 32px;
+    border-radius: 18px;
+  }
+  div:has(> .searchBox):has(> .sorts) > p:first-child {
+    font-size: 19px;
+  }
+  .sorts > .sortList {
+    min-width: 72px;
+    padding: 0 12px;
+  }
 }

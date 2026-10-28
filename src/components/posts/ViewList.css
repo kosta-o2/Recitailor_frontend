@@ -1,53 +1,126 @@
+/* 한 페이지의 카드 3개를 데스크톱에서 3열로 표시 */
 .girdList {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 5px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 20px;
+  width: 100%;
 }
 .girdList > div {
-  border: 1px solid var(--border-default);
-  padding: 8px;
+  min-width: 0;
+  padding: 0 0 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 14px;
+  background: var(--bg-surface, #fff);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
-.simplePostImg {
+.girdList > div:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.07);
+}
+.girdList .simplePostImg {
+  display: block;
   width: 100%;
-  border-radius: 10px;
+  aspect-ratio: 350 / 166;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+  background: #e8efed;
 }
-.simplePostCategorys {
+.girdList .simplePostCategorys {
   display: flex;
-  padding: 8px;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 15px 0;
 }
-.simplePostCategory {
-  background-color: var(--color-accent);
-  border-radius: 20px;
-  width: auto;
-  display: flex;
-  padding: 5px;
+.girdList .simplePostCategory {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: auto;
+  min-width: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #e8f3f0;
+  color: #216e68;
+  font-size: 11px;
+  line-height: 1.2;
 }
-.simplePostInfos {
-  display: flex;
-  flex-direction: row;
-  margin: 0 8px;
-  gap: 0px 8px;
+.girdList .simplePostCategory:nth-child(2) {
+  background: #fff0e8;
+  color: #c87b51;
 }
-.simplePostInfosAuthor {
+.girdList .simplePostTitle {
+  padding: 13px 15px 12px;
+  min-height: 48px;
+  box-sizing: border-box;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--text-primary, #222);
+  overflow-wrap: anywhere;
+}
+.girdList hr {
+  width: calc(100% - 30px) !important;
+  height: 1px;
+  margin: 0 auto 12px;
+  border: none;
+  background: var(--border-default, #e0e0e0);
+}
+.girdList .simplePostInfosAuthor {
   display: flex;
-  flex-direction: row;
-  margin: 0 8px;
-  gap: 0px 8px;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 15px 7px;
 }
-.simplePostInfoImg {
-  width: 8pt;
+.girdList .simplePostInfos {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
 }
-.simplePostInfo {
-  font-size: 8pt;
-  justify-self: center;
+.girdList .simplePostInfos .simplePostInfo:nth-of-type(2) {
+  margin-left: 8px;
+}
+.girdList .simplePostInfoImg {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+}
+.girdList .simplePostInfo {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-tertiary, #767676);
+}
+.girdList .simplePostLike {
+  font-size: 12px;
+  color: #216e68;
+}
+.girdList .simplePostInfosAuthor:last-child {
+  margin-bottom: 0;
 }
 
-.pageNumber {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
+@media (max-width: 900px) {
+  .girdList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+@media (max-width: 540px) {
+  .girdList {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .girdList > div {
+    transition: none;
+  }
 }

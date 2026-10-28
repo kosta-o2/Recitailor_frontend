@@ -20,21 +20,11 @@ function PostList() {
   const [currentPageGroup, setCurrentPageGroup] = useState(1); //현재  페이지 그룹
   const lastPage = response?.last;
   const pageGroup = Math.ceil(lastPage / PAGE_GROUP_SIZE); //페이지 그룹의 수
-  const [view, SetView] = useState(1); // 현재 페이지
 
   const dispatch = useDispatch();
   const { sortBy, sortOrder, page, limit } = useSelector(
     (state) => state.posts,
   );
-  //해당하는 페이지에 맞게 데이터 호출
-  // useEffect(() => {
-  //   const callPageDate = async (view) => {
-  //     // data, first, items, last, next, pages, prev
-  //     const res = await getPostbyPage(view);
-  //     setResponse(res);
-  //   };
-  //   callPageDate(view);
-  // }, [view]);
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -62,6 +52,13 @@ function PostList() {
       }),
     );
   };
+  const PageButton = (key, onClick, value, disabled) => {
+    return (
+      <button key={key} disabled={disabled} onClick={onClick}>
+        {value}
+      </button>
+    );
+  };
 
   //페이지 이동
   const ViewNumber = () => {
@@ -73,64 +70,59 @@ function PostList() {
     const re = [];
 
     re.push(
-      <button
-        key="first"
-        disabled={currentPageGroup === 1}
-        onClick={() => {
+      PageButton(
+        "first",
+        () => {
           setCurrentPageGroup(1);
-        }}
-      >
-        〈〈
-      </button>,
+        },
+        "〈〈",
+        currentPageGroup === 1,
+      ),
     );
     re.push(
-      <button
-        key="pre"
-        disabled={currentPageGroup === 1}
-        onClick={() => {
+      PageButton(
+        "pre",
+        () => {
           setCurrentPageGroup(
             currentPageGroup === 1 ? 1 : currentPageGroup - 1,
           );
-        }}
-      >
-        〈
-      </button>,
+        },
+        "〈",
+        currentPageGroup === 1,
+      ),
     );
     for (let index = minPage; index <= maxPage; index++) {
       re.push(
-        <button
-          key={index}
-          onClick={() => {
+        PageButton(
+          index,
+          () => {
             dispatch(setPage(index));
-          }}
-        >
-          {index}
-        </button>,
+          },
+          index,
+        ),
       );
     }
     re.push(
-      <button
-        key="next"
-        disabled={currentPageGroup >= 4}
-        onClick={() => {
+      PageButton(
+        "next",
+        () => {
           setCurrentPageGroup(
             currentPageGroup === pageGroup ? pageGroup : currentPageGroup + 1,
           );
-        }}
-      >
-        〉
-      </button>,
+        },
+        "〉",
+        currentPageGroup >= 4,
+      ),
     );
     re.push(
-      <button
-        key="end"
-        disabled={currentPageGroup >= 4}
-        onClick={() => {
+      PageButton(
+        "end",
+        () => {
           setCurrentPageGroup(pageGroup);
-        }}
-      >
-        〉〉
-      </button>,
+        },
+        "〉〉",
+        currentPageGroup >= 4,
+      ),
     );
     return re;
   };
@@ -169,6 +161,7 @@ function PostList() {
               className="sortList"
               onClick={() => {
                 sortEvent(value);
+                setCurrentPageGroup(1);
               }}
               key={value.label}
             >
@@ -177,9 +170,8 @@ function PostList() {
           );
         })}
       </div>
-      {ViewNumber()}
       <ViewList data={response?.data} />
-      <div></div>
+      {ViewNumber()}
     </div>
   );
 }
