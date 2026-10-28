@@ -1,18 +1,30 @@
-.cooking_info {
-  background-color: var(--bg-secondary);
-  border: 1px solid red;
-  border-radius: 10px;
+/* Cooking_info.jsx: the existing classNames are sufficient. */
+.posts .head > .info > .cooking_info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex: 1 1 76px;
+  min-width: 70px;
+  min-height: 35px;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: #f8f7f6;
+  text-align: center;
 }
-.infotitle {
-  color: var(--text-primary);
-  font-size: 12pt;
-  margin-bottom: 5px;
+.posts .cooking_info .infotitle {
+  color: #88928f;
+  font-size: 11px;
+  line-height: 1.25;
+  white-space: nowrap;
 }
-.info {
-  color: #283533;
-  font-size: 11pt;
+.posts .cooking_info .info {
+  display: block;
+  margin: 1px 0 0;
+  color: #2f3e39;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
 }

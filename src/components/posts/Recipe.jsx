@@ -2,12 +2,12 @@ import React from "react";
 
 function Recipe({ recipe }) {
   return (
-    <div>
+    <div className="recipe-steps">
       {recipe.map((value, index) => {
         return (
-          <div key={index}>
-            <div>{index + 1}단계</div>
-            <div>{value}</div>
+          <div className="recipe-step" key={index}>
+            <div className="recipe-step-number">{index + 1}단계</div>
+            <div className="recipe-step-description">{value}</div>
           </div>
         );
       })}

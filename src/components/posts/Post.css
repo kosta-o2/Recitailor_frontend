@@ -1,55 +1,319 @@
+/* Post detail — scoped to .posts to avoid affecting other pages.
+   Reference: Post.png. Existing JSX and index.css design tokens are preserved. */
 .posts {
-  background-color: var(--bg-page);
-  border: 0px solid var(--border-default);
+  --post-teal: #216e69;
+  --post-muted-teal: #e8f1ee;
+  --post-orange: #f5a47d;
+  --post-line: #e3e5e4;
+  --post-muted: #87928f;
+  width: min(calc(100% - 40px), 1040px);
+  margin: 24px auto 36px;
+  padding: 24px 30px 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 20px;
+  background: var(--bg-surface, #fff);
+  color: var(--text-primary, #222);
+  font-size: 13px;
 }
-.header {
+
+/* The current JSX renders '게시글생성' in this slot, not the breadcrumb in the reference. */
+.posts > div:first-child:not(.header) {
+  margin: 0 0 17px;
+  color: var(--post-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.posts > .header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.posts > .header > div:first-child {
+  min-width: 0;
+}
+.posts > .header > div:first-child img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 360 / 210;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--post-muted-teal);
+}
+.posts .head {
+  min-width: 0;
+}
+.posts .titles {
   display: flex;
-  flex-direction: row;
-}
-img {
-  width: 30%;
-}
-.head {
-  margin-left: 20px;
-}
-.title {
-  color: var(--text-primary);
-  font-size: 23pt;
-}
-.content {
-  color: var(--text-secondary);
-  font-size: 12pt;
-  margin: 20px 0;
-}
-.info {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-}
-/* 재료 */
-.postInfoHeader {
-  display: flex;
-  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  padding: 15px;
+  gap: 12px;
+  min-width: 0;
 }
-.postInfoCon {
+.posts .title {
+  min-width: 0;
+  font-size: clamp(19px, 2.4vw, 24px);
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.045em;
+  color: #263936;
+  overflow-wrap: anywhere;
+}
+.posts .toggleLike {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.posts .toggleLike:hover {
+  transform: scale(1.1);
+}
+.posts .toggleLike:active {
+  transform: scale(0.96);
+}
+.posts .titles:has(.author) {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 10px;
+}
+.posts .author,
+.posts .create_at {
+  color: var(--post-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.posts .content {
+  margin: 15px 0 16px;
+  color: var(--post-muted);
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.posts .head > .info {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 14px;
+}
+/* Cooking_info's markup is not provided. Style only its top-level wrappers. */
+.posts .head > .info > * {
+  flex: 1 1 76px;
+  min-width: 72px;
+  box-sizing: border-box;
+  padding: 8px 9px;
+  border-radius: 11px;
+  background: #f8f7f6;
+  text-align: center;
+  font-size: 12px;
+}
+.posts .head > .info > * :where(p, span, div) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.posts > hr {
+  height: 1px;
+  margin: 22px 0 0;
+  border: 0;
+  background-color: var(--post-line);
+}
+.posts .ingredient,
+.posts .recipe {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.posts .postInfoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 5px 18px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.posts .postInfoCon {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.posts .postInfoCon > p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #344440;
+}
+.posts .postInfoCon > .postInfoCount {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e2efff;
+  color: #3778c1;
+  font-size: 12px;
+  line-height: 1.3;
 }
-.postInfoCon > p {
-  font-size: 12pt;
-  margin-left: 20px;
+.posts .postInfoHeader > p {
+  margin: 0;
+  color: #7d8b88;
+  font-size: 12px;
+  line-height: 1;
 }
-.postInfoCount {
-  background-color: var(--color-accent);
-  border-radius: 10px;
-  padding: 10px;
+.posts .ingredients {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px 18px;
+  padding: 0 18px 12px;
+  cursor: default;
 }
-.ingredients {
+.posts .ingredients > * {
+  min-width: 0;
+}
+/* Ingredient component output may be a list or an element containing a list. */
+.posts .ingredients :where(ul, ol) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.posts .ingredients :where(li) {
+  position: relative;
+  margin: 0 0 6px;
+  padding: 10px 14px 10px 24px;
+  border-radius: 18px;
+  background: #f8f8f8;
+  color: #3a4441;
+  font-size: 12px;
+  line-height: 1.3;
+}
+.posts .ingredients li::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--post-orange);
+  transform: translateY(-50%);
+}
+/* Generic fallback until Recipe.jsx's markup and its own CSS are available. */
+.posts .recipe > :not(.postInfoHeader) {
+  margin: 0 18px 12px;
+  font-size: 12px;
+  line-height: 1.65;
+  cursor: default;
+}
+.posts .recipe :where(ol, ul) {
+  padding-left: 28px;
+}
+.posts .recipe :where(li) {
+  margin-bottom: 14px;
+  padding-left: 4px;
+}
+.posts .recipe :where(li)::marker {
+  color: var(--post-orange);
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .posts {
+    width: calc(100% - 24px);
+    padding: 20px;
+    margin: 16px auto 24px;
+  }
+  .posts > .header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .posts > .header > div:first-child img {
+    aspect-ratio: 16 / 9;
+  }
+  .posts .title {
+    font-size: 22px;
+  }
+  .posts .ingredients {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 420px) {
+  .posts {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .posts .title {
+    font-size: 20px;
+  }
+  .posts .postInfoHeader {
+    padding-inline: 8px;
+  }
+  .posts .ingredients {
+    padding-inline: 8px;
+  }
+  .posts .head > .info > * {
+    flex-basis: calc(50% - 8px);
+  }
+}
+
+/* Recipe.jsx: step markup classNames only; Post.jsx remains unchanged. */
+.posts .recipe .recipe-steps {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 18px 20px;
+  padding: 0;
+  cursor: default;
+  counter-reset: recipe-step-counter;
+}
+.posts .recipe .recipe-step {
+  counter-increment: recipe-step-counter;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  column-gap: 12px;
+  min-width: 0;
+}
+.posts .recipe .recipe-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f5a47d;
+  color: #fff;
+  font-size: 0;
+  line-height: 1;
+}
+/* Keep JSX text intact, but display the numbered circle from a CSS counter. */
+.posts .recipe .recipe-step-number::after {
+  content: counter(recipe-step-counter);
+  font-size: 12px;
+  font-weight: 600;
+}
+.posts .recipe .recipe-step-description {
+  padding-top: 3px;
+  color: #3a4643;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 420px) {
+  .posts .recipe .recipe-steps {
+    margin-inline: 8px;
+  }
 }
