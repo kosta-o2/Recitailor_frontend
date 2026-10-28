@@ -1,28 +1,59 @@
+const fs = require("node:fs");
 const path = require("node:path");
+const express = require("express");
 const dotenv = require("dotenv");
 const jsonServer = require("json-server");
 const { createAuthRouter } = require("./routes/auth.cjs");
 const { createMypageRouter } = require("./routes/mypage.cjs");
+const { createRecipesRouter } = require("./routes/recipes.cjs");
 
 // 프로젝트 루트의 .env 읽기
 dotenv.config({
   path: path.join(__dirname, "../.env"),
 });
 
+const DEFAULT_DB_FILE = path.join(__dirname, "../db.json");
+const DEFAULT_UPLOAD_DIR = path.join(__dirname, "images");
+
+// DB_FILE, UPLOAD_DIR 환경변수로 DB 파일과 이미지 폴더를 바꿀 수 있다. (테스트용)
+function createApp({
+  dbFile = process.env.DB_FILE || DEFAULT_DB_FILE,
+  uploadDir = process.env.UPLOAD_DIR || DEFAULT_UPLOAD_DIR,
+} = {}) {
 if (!process.env.JWT_SECRET) {
   throw new Error(".env에 JWT_SECRET을 설정해주세요.");
 }
 
 const server = jsonServer.create();
 
-// 프로젝트 루트의 db.json 연결
-const dataRouter = jsonServer.router(path.join(__dirname, "../db.json"));
+fs.mkdirSync(uploadDir, { recursive: true });
+
+// db.json 연결
+let dataRouter = jsonServer.router(dbFile);
 
 if (!Array.isArray(dataRouter.db.get("members").value())) {
   throw new Error('db.json에 "members": []를 설정해주세요.');
 }
 
+// 이미지 메타데이터 컬렉션이 없으면 만든다. (기존 데이터는 그대로 둔다)
+if (!Array.isArray(dataRouter.db.get("recipe_post_images").value())) {
+  dataRouter.db.set("recipe_post_images", []).write();
+  dataRouter = jsonServer.router(dbFile);
+}
+
 server.use(jsonServer.defaults());
+
+// 업로드된 이미지 제공 (/api 밖). 정해진 폴더 안의 파일만 읽을 수 있다.
+server.use(
+  "/uploads",
+  express.static(uploadDir, {
+    dotfiles: "ignore",
+    index: false,
+    redirect: false,
+    maxAge: "1d",
+    setHeaders: (res) => res.setHeader("X-Content-Type-Options", "nosniff"),
+  }),
+);
 
 server.use(jsonServer.bodyParser);
 
@@ -87,6 +118,9 @@ server.use("/api", (req, res, next) => {
   next();
 });
 
+// 게시글 등록(이미지 업로드)·이미지 합쳐 조회, 기본 쓰기 차단 (기본 CRUD보다 먼저 등록)
+server.use("/api", createRecipesRouter(dataRouter.db, { uploadDir }));
+
 // 다른 데이터의 JSON Server 기본 CRUD
 server.use("/api", dataRouter);
 
@@ -114,8 +148,16 @@ server.use((error, req, res, next) => {
   });
 });
 
-const port = Number(process.env.PORT) || 4000;
+return { server, db: dataRouter.db, uploadDir };
+}
 
-server.listen(port, () => {
-  console.log(`API 서버: http://localhost:${port}/api`);
-});
+if (require.main === module) {
+  const { server } = createApp();
+  const port = Number(process.env.PORT) || 4000;
+
+  server.listen(port, () => {
+    console.log(`API 서버: http://localhost:${port}/api`);
+  });
+}
+
+module.exports = { createApp };

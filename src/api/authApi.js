@@ -1,4 +1,5 @@
 import api from "./axios";
+import { clearSession, saveSession } from "./session";
 
 // 회원가입
 export async function signup({ id, nickname, email, password }) {
@@ -36,7 +37,7 @@ export async function login({ id, password }) {
     password,
   });
 
-  sessionStorage.setItem("accessToken", data.accessToken);
+  saveSession(data);
 
   return data;
 }
@@ -48,7 +49,7 @@ export async function confirmPasswordReset({ token, newPassword }) {
     newPassword,
   });
 
-  sessionStorage.removeItem("accessToken");
+  clearSession();
 
   return data;
 }
@@ -60,5 +61,5 @@ export function startGoogleLogin() {
 
 // 프론트의 로그인 토큰 삭제
 export function logout() {
-  sessionStorage.removeItem("accessToken");
+  clearSession();
 }
