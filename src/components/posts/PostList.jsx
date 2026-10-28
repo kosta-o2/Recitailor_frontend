@@ -1,50 +1,153 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import "./PostList.css";
-import db from "../../../db.json";
 import search from "../../assets/images/search.svg";
-import SortButton from "./postUtil/sortButton";
 import ViewList from "./ViewList";
 import Image from "./postUtil/Image";
 import { getPostbyPage } from "../../api/recipePostApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setPage, setSort } from "../../features/postSlice";
+import { useNavigate } from "react-router";
+
 function PostList() {
+  const nav = useNavigate();
   const [inputBox, setInputBox] = useState("");
-  const sortList = ["전체", "최신순", "좋아요 순"];
   const inputRef = useRef();
-  const sortRef = useRef();
-
   const [response, setResponse] = useState();
-  const [view, SetView] = useState(0);
+  const sortList = [
+    { label: "기본", sortBy: null, sortOrder: null },
+    { label: "최신 순", sortBy: "create_at", sortOrder: "desc" },
+    { label: "좋아요 순", sortBy: "likes", sortOrder: "desc" },
+  ];
+  const PAGE_GROUP_SIZE = 5;
+  const [currentPageGroup, setCurrentPageGroup] = useState(1); //현재  페이지 그룹
+  const lastPage = response?.last;
+  const pageGroup = Math.ceil(lastPage / PAGE_GROUP_SIZE); //페이지 그룹의 수
 
+  const dispatch = useDispatch();
+  const { sortBy, sortOrder, page, limit } = useSelector(
+    (state) => state.posts,
+  );
   useEffect(() => {
-    const callPageDate = async (view) => {
-      // data, first, items, last, next, pages, prev
-      const res = await getPostbyPage(view);
-      setResponse(await res);
-    };
-    callPageDate(view);
-  }, [view]);
+    const fetchPosts = async () => {
+      try {
+        const data = await getPostbyPage({
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+        });
 
-  //숫자 보여주기
+        setResponse(data);
+      } catch (error) {
+        console.error("게시글 조회 실패:", error);
+      }
+    };
+
+    fetchPosts();
+  }, [page, limit, sortBy, sortOrder]);
+
+  const sortEvent = (sort) => {
+    dispatch(
+      setSort({
+        sortBy: sort.sortBy,
+        sortOrder: sort.sortOrder,
+      }),
+    );
+  };
+  const PageButton = (key, onClick, value, disabled) => {
+    return (
+      <button key={key} disabled={disabled} onClick={onClick}>
+        {value}
+      </button>
+    );
+  };
+
+  //페이지 이동
   const ViewNumber = () => {
-    const result = [];
-    for (let index = 1; index <= response?.last; index++) {
-      result.push(
-        <div
-          key={index}
-          onClick={() => {
-            SetView(index);
-          }}
-        >
-          {index}
-        </div>,
+    const minPage = (currentPageGroup - 1) * PAGE_GROUP_SIZE + 1;
+    const maxPage =
+      currentPageGroup * PAGE_GROUP_SIZE < lastPage
+        ? currentPageGroup * PAGE_GROUP_SIZE
+        : lastPage;
+    const re = [];
+
+    re.push(
+      PageButton(
+        "first",
+        () => {
+          setCurrentPageGroup(1);
+        },
+        "〈〈",
+        currentPageGroup === 1,
+      ),
+    );
+    re.push(
+      PageButton(
+        "pre",
+        () => {
+          setCurrentPageGroup(
+            currentPageGroup === 1 ? 1 : currentPageGroup - 1,
+          );
+        },
+        "〈",
+        currentPageGroup === 1,
+      ),
+    );
+    for (let index = minPage; index <= maxPage; index++) {
+      re.push(
+        PageButton(
+          index,
+          () => {
+            dispatch(setPage(index));
+          },
+          index,
+        ),
       );
     }
-    return result;
+    re.push(
+      PageButton(
+        "next",
+        () => {
+          setCurrentPageGroup(
+            currentPageGroup === pageGroup ? pageGroup : currentPageGroup + 1,
+          );
+        },
+        "〉",
+        currentPageGroup >= 4,
+      ),
+    );
+    re.push(
+      PageButton(
+        "end",
+        () => {
+          setCurrentPageGroup(pageGroup);
+        },
+        "〉〉",
+        currentPageGroup >= 4,
+      ),
+    );
+    return re;
   };
+
   return (
-    <div>
-      <p>레시피게시판</p>
-      <p>다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.</p>
+    <div className="postList">
+      <div className="postHeader">
+        <div className="postHeaderText">
+          <p className="postTitle">레시피게시판</p>
+          <p className="postDescription">
+            다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="postCreateButton"
+          onClick={() => {
+            nav("/post/create");
+          }}
+        >
+          + 게시글 작성
+        </button>
+      </div>
       <div className="searchBox">
         <div className="searchLine">
           <Image src={search} alt="검색" />
@@ -69,25 +172,23 @@ function PostList() {
       </div>
 
       <div className="sorts">
-        <button
-          className="sortList"
-          onClick={() => {
-            console.log(sortRef.current.ref);
-          }}
-          ref={sortRef}
-        >
-          전체
-        </button>
-        <button className="sortList" onClick={(e) => {}} ref={sortRef}>
-          최신순
-        </button>
-        <button className="sortList" onClick={(e) => {}} ref={sortRef}>
-          좋아요순
-        </button>
+        {sortList.map((value, index) => {
+          return (
+            <button
+              className="sortList"
+              onClick={() => {
+                sortEvent(value);
+                setCurrentPageGroup(1);
+              }}
+              key={value.label}
+            >
+              {value.label}
+            </button>
+          );
+        })}
       </div>
-      {ViewNumber()}
       <ViewList data={response?.data} />
-      <div></div>
+      <div className="postPagination">{ViewNumber()}</div>
     </div>
   );
 }

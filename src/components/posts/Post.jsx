@@ -3,36 +3,18 @@ import Cooking_info from "./Cooking_info";
 import Ingredient from "./Ingredient";
 import "./Post.css";
 import Recipe from "./Recipe";
-import PostList from "./PostList";
+import like from "../../assets/images/like.svg";
+import empty_heart from "../../assets/images/empty_heart.svg";
 import Image from "./postUtil/Image";
 import { useParams } from "react-router";
 import { getPostbyId } from "../../api/recipePostApi";
-
-/*{
-	id: ,//index번호로 primary key
-	title:, //제목
-	content:, //소개글
-	portion: , //몇인분인지
-	author: ,//작성자 id
-	time: ,//단위 (분)
-	all_ingredient: {
-		ingredients: [], //재료들
-		sauces: [] //소스들
-	 },
-	category:{
-		method: "", //방법: 밑반찬, 메인반찬, 국/탕, 찌개,  디저트, 면/만두, 밥/죽/떡, 퓨젼, 김치/젓갈/장류, 양념/소스/잼, 양식, 샐러드, 스프, 빵, 과자, 차/음료/술, 기타
-		type: "" //종류: 볶음, 끓이기, 부침, 조림, 무침, 비빔,찜, 절임,튀김, 삶기,굽기, 데치기, 회, 기타
-	},
-	recipes: [], // 배열 순서대로 레시피
-	create_at: "", //생성일자
-	update_at:"" //수정일자
-}*/
 
 function Post() {
   const paramsId = useParams().id;
   const [ingreVisible, setIngreVisible] = useState(false);
   const [recipeVisible, setRecipeVisible] = useState(false);
   const [post, setPost] = useState([]);
+  const [isLike, setLike] = useState(false);
 
   useEffect(() => {
     const getDetail = async (params) => {
@@ -59,6 +41,23 @@ function Post() {
   const visible = (isVisible) => {
     return isVisible ? <p>△</p> : <p>▽</p>;
   };
+  const ToggleLikeView = () => {
+    return (
+      <img
+        src={isLike ? like : empty_heart}
+        alt="좋아요 토글"
+        className="toggleLike"
+        onClick={() => {
+          toggleLike();
+          console.log(isLike);
+        }}
+      />
+    );
+  };
+  const toggleLike = () => {
+    //TODO 좋아요 기능 구현
+    setLike(!isLike);
+  };
   return (
     <>
       {post ? (
@@ -69,7 +68,18 @@ function Post() {
               <Image src={img_url} alt="대표이미지" />
             </div>
             <div className="head">
-              <div className="title">{title}</div>
+              <div className="titles">
+                <div className="title">{title}</div>
+                {ToggleLikeView()}
+              </div>
+              <div className="titles">
+                <div className="author">
+                  by {author ? author : "삭제된 계정입니다."}
+                </div>
+                <div className="create_at">
+                  작성일: {create_at?.slice(0, 10)}
+                </div>
+              </div>
               <div className="content">{content}</div>
               <div className="info">
                 <Cooking_info title="조리 시간" info={time + "분"} />
