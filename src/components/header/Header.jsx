@@ -1,9 +1,18 @@
 import React from "react";
 import styles from "./Header.module.css";
 import logo from "../../assets/images/logo.png";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
 
 function Header() {
+  const navigate = useNavigate();
+  const { member, logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    navigate("/");
+  }
+
   return (
     <div className={styles.header}>
       <div className={styles.inner}>
@@ -31,9 +40,19 @@ function Header() {
           </Link>
         </nav>
         <div className={styles.account}>
-          <Link to="/login" className={styles.link}>
-            로그인
-          </Link>
+          {member ? (
+            <button
+              type="button"
+              className={`${styles.link} ${styles.logout}`}
+              onClick={handleLogout}
+            >
+              로그아웃
+            </button>
+          ) : (
+            <Link to="/login" className={styles.link}>
+              로그인
+            </Link>
+          )}
           <Link to="/mypage" className={styles.link}>
             마이페이지
           </Link>

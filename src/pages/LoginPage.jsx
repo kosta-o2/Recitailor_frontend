@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 import AuthLayout from "../components/authpage/AuthLayout";
 import AuthCard from "../components/authpage/AuthCard";
 import FormField from "../components/authpage/FormField";
 import PasswordField from "../components/authpage/PasswordField";
-import AuthSocialActions from "../components/authpage/AuthSocialActions";
+import authStyles from "../components/authpage/Auth.module.css";
 import { loginText, placeholders } from "../constants/authText";
 import { login } from "../api/authApi";
 import { useAuthSubmit } from "../hooks/useAuthSubmit";
@@ -13,6 +14,8 @@ import styles from "./LoginPage.module.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login: authLogin } = useAuth();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,8 +33,9 @@ function LoginPage() {
     }
 
     await submit(async () => {
-      await login({ id: id.trim(), password });
-      navigate("/");
+      const data = await login({ id: id.trim(), password });
+      authLogin(data.member);
+      navigate(location.state?.from?.pathname ?? "/", { replace: true });
     });
   }
 
@@ -88,12 +92,18 @@ function LoginPage() {
           </div>
         </div>
 
-        {/* <AuthSocialActions
-          error={error}
-          submitting={submitting}
-          submitLabel="로그인"
-          googleLabel="Google로 시작하기"
-        /> */}
+        {error && (
+          <p role="alert" className={authStyles.form_error}>
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          className={`${authStyles.primary_button} ${authStyles.submit}`}
+          disabled={submitting}
+        >
+          로그인
+        </button>
       </AuthCard>
     </AuthLayout>
   );

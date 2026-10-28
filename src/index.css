@@ -16,6 +16,20 @@
   --color-success: #1f6b5c;
   --bg-result: #f3f6fb;
 
+  /* 마이페이지 */
+  --color-primary-soft: #eef3fa;
+  --color-error-soft: #fdf0e9;
+  --color-warning-bg: #fff6f0;
+  --color-warning-border: #f6d5c2;
+  --color-success-bg: #eaf5f2;
+  --bg-muted: #f3f4f6;
+  --bg-thumb: #eef1f5;
+  --bg-badge: #f1f3f5;
+  --border-card: #e3e5e8;
+  --text-label: #33373e;
+  --text-sub: #5b616b;
+  --text-placeholder: #8a8f98;
+
   /* 로고 */
   --logo-primary: #003688;
 

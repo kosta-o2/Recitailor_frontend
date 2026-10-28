@@ -49,6 +49,14 @@
   white-space: nowrap;
 }
 
+.header .logout {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .header nav {
   display: flex;
   align-items: center;
@@ -61,11 +69,13 @@
   gap: 32px;
 }
 
-.header a:hover {
+.header a:hover,
+.header .logout:hover {
   color: var(--color-primary);
 }
 
-.header a:focus-visible {
+.header a:focus-visible,
+.header .logout:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 6px;
 }
@@ -83,7 +93,8 @@
     gap: 20px;
   }
 
-  .header a {
+  .header a,
+  .header .logout {
     font-size: 16px;
   }
 
