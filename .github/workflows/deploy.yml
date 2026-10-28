@@ -1,0 +1,79 @@
+name: Recitailor CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: recitailor-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: CI - React Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React
+        env:
+          VITE_API_BASE_URL: /api
+        run: npm run build
+
+  deploy:
+    name: CD - Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy application
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -o BatchMode=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'bash -se' <<'EOF'
+          set -e
+
+          cd /home/ubuntu/Recitailor_frontend
+
+          git fetch origin main
+          git checkout main
+          git merge --ff-only origin/main
+
+          sudo -n docker compose config --quiet
+          sudo -n docker compose up -d --build
+
+          sudo -n docker compose ps
+          EOF
