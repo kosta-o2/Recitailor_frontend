@@ -1,38 +1,243 @@
-.searchBox {
-  border: 1px var(--border-default) solid;
-  border-radius: 20px;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-}
-.searchLine {
-}
-.searchLine > img {
-  width: 20px;
-  height: 20px;
-  align-items: center;
-  justify-content: center;
-}
-.searchLine > input {
-  font-size: 9pt;
-  padding: 10px 20px 10px 5px;
-  margin: 0px 20px;
-}
-.searchBox > p {
-  padding-right: 10px;
+/* PostList.updated.jsx 전용: 기존 PostList.css의 변수와 레이아웃을 계승 */
+.postList {
+  --post-list-green: #216e68;
+  --post-list-orange: #f5a477;
+  width: min(calc(100% - 48px), 1160px);
+  margin: 32px auto 56px;
+  padding: 34px 32px 44px;
+  box-sizing: border-box;
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 22px;
+  color: var(--text-primary, #222);
 }
 
-.sorts {
-  /* display: inline-flex; */
+.postList *,
+.postList *::before,
+.postList *::after {
+  box-sizing: border-box;
 }
-.sortList {
-  background-color: var(--bg-secondary);
-  border: 1px red solid;
-  margin: 0px 20px;
-  padding: 5px;
-  border-radius: 30px;
+
+/* 제목, 소개 및 생성 버튼: JSX에서 추가한 postHeader 사용 */
+.postList .postHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
 }
-.sortList:focus {
-  background-color: var(--color-primary);
-  color: var(--text-inverse);
+.postList .postHeaderText {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.postList .postTitle {
+  margin: 0 0 8px;
+  color: var(--text-primary, #222);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.postList .postDescription {
+  margin: 0;
+  color: var(--text-tertiary, #767676);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.postList .postCreateButton {
+  flex: 0 0 auto;
+  min-width: 126px;
+  min-height: 44px;
+  padding: 10px 16px;
+  margin: 0;
+  border: 1px solid var(--post-list-green);
+  border-radius: 10px;
+  background: var(--post-list-green);
+  color: var(--bg-surface, #fff);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+.postList .postCreateButton:hover {
+  filter: brightness(0.92);
+}
+.postList .postCreateButton:active {
+  transform: translateY(1px);
+}
+.postList .postCreateButton:focus-visible {
+  outline: 2px solid var(--color-primary, #003688);
+  outline-offset: 3px;
+}
+
+/* 검색: 기존 CSS 형태와 색상 변수 유지 */
+.postList > .searchBox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 10px;
+  background: var(--bg-surface, #fff);
+}
+.postList .searchBox:focus-within {
+  border-color: var(--color-primary, #003688);
+}
+.postList .searchLine {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 10px;
+}
+.postList .searchLine img {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.postList .searchLine > input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 0;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-primary, #222);
+}
+.postList .searchLine > input::placeholder {
+  color: var(--text-tertiary, #767676);
+}
+.postList .searchBox > p {
+  margin: 0;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--text-tertiary, #767676);
+  font-size: 12px;
+  user-select: none;
+}
+
+/* 정렬: 기존 기본/최신 순/좋아요 순 스타일 유지 */
+.postList > .sorts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.postList .sorts > .sortList {
+  min-width: 85px;
+  height: 34px;
+  padding: 0 16px;
+  margin: 0;
+  border: 1px solid var(--border-default, #e0e0e0);
+  border-radius: 999px;
+  background: var(--bg-surface, #fff);
+  color: var(--text-secondary, #444);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.postList .sorts > .sortList:hover {
+  border-color: var(--post-list-green);
+}
+.postList .sorts > .sortList:focus {
+  background: var(--post-list-green);
+  color: var(--bg-surface, #fff);
+  border-color: var(--post-list-green);
+}
+.postList .sorts > .sortList:focus-visible {
+  outline: 2px solid var(--post-list-green);
+  outline-offset: 2px;
+}
+
+/* ViewList 카드 레이아웃 자체는 수정하지 않음 */
+.postList > .girdList {
+  width: 100%;
+  min-width: 0;
+}
+
+/* 변경된 JSX의 페이지네이션 래퍼 */
+.postList > .postPagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  margin-top: 20px;
+}
+.postList .postPagination > button {
+  flex: 0 0 30px;
+  min-width: 30px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-tertiary, #767676);
+  font-size: 12px;
+  cursor: pointer;
+}
+.postList .postPagination > button:hover:not(:disabled) {
+  color: var(--post-list-green);
+  background: var(--bg-surface, #fff);
+  outline: 1px solid var(--border-default, #e0e0e0);
+}
+.postList .postPagination > button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.postList .postPagination > button:focus-visible {
+  outline: 2px solid var(--post-list-green);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .postList {
+    width: calc(100% - 24px);
+    margin: 16px auto 32px;
+    padding: 24px 18px 32px;
+    border-radius: 18px;
+  }
+  .postList .postHeader {
+    gap: 12px;
+  }
+  .postList .postTitle {
+    font-size: 19px;
+  }
+  .postList .postCreateButton {
+    min-width: 108px;
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .postList .sorts > .sortList {
+    min-width: 72px;
+    padding: 0 12px;
+  }
+}
+@media (max-width: 420px) {
+  .postList .postHeader {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .postList .postCreateButton {
+    margin-left: auto;
+  }
 }

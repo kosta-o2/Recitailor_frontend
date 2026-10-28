@@ -2,18 +2,20 @@ import api from "./axios";
 
 const endpoint = "/recipes";
 // 레시피 목록 조회 (JSON Server 0.17 페이지 응답)
-export async function getPostbyPage(page) {
+export async function getPostbyPage({ page, limit, sortBy, sortOrder }) {
   const currentPage = Math.max(1, Number(page) || 1);
-  const limit = 8;
-  const { data, headers } = await api.get(endpoint, {
-    params: {
-      _page: currentPage,
-      _limit: limit,
-    },
-  });
-  const items = Number(headers["x-total-count"]);
-  const pages = Math.ceil(items / limit);
+  const params = {
+    _page: page,
+    _limit: limit,
+  };
+  if (sortBy && sortOrder) {
+    params._sort = sortBy;
+    params._order = sortOrder;
+  }
+  const { data, headers } = await api.get(endpoint, { params });
 
+  const items = Number(headers["x-total-count"]); //아이템 최대 수
+  const pages = Math.ceil(items / limit);
   return {
     data,
     first: 1,
@@ -32,3 +34,7 @@ export async function getPostbyId(id) {
 
   return data;
 }
+export const createRecipePost = async (postData) => {
+  const response = await api.post(endpoint, postData);
+  return response.data;
+};

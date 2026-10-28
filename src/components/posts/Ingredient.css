@@ -1,6 +1,42 @@
-li {
-  color: --color-accent;
+/* Ingredient.jsx: ingredient list inside the recipe detail page */
+.posts .ingredient-group {
+  min-width: 0;
+  font-size: 0;
+} /* 기존 "재료/소스" 텍스트 숨김 */
+.posts .ingredient-group .ingredient-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
-li > p {
-  color: --text-primary;
+.posts .ingredient-group .ingredient-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 31px;
+  margin: 0;
+  padding: 7px 15px 7px 25px;
+  border-radius: 999px;
+  background: #f8f8f8;
+  box-sizing: border-box;
+  color: #3d4845;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.posts .ingredient-group .ingredient-item::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f5a47d;
+  transform: translateY(-50%);
+}
+.posts .ingredient-group .ingredient-item-text {
+  margin: 0;
+  overflow-wrap: anywhere;
 }

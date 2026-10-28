@@ -1,0 +1,733 @@
+/* ========================================
+   PostCreate - 레시피 생성 페이지
+======================================== */
+
+.post-create {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.post-create *,
+.post-create *::before,
+.post-create *::after {
+  box-sizing: border-box;
+}
+
+.post-create-container {
+  width: min(100% - 32px, 1100px);
+  margin: 32px auto;
+  padding: 32px;
+  border: 1px solid var(--border-default);
+  border-radius: 30px;
+  background-color: var(--bg-surface);
+}
+
+/* ========================================
+   페이지 제목
+======================================== */
+
+.post-create-header {
+  margin-bottom: 28px;
+}
+
+.post-create-title {
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.post-create-description {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ========================================
+   공통 섹션
+======================================== */
+
+.post-create-image,
+.post-create-field,
+.post-create-ingredients,
+.post-create-steps,
+.post-create-info,
+.post-create-category {
+  margin-bottom: 26px;
+}
+
+.post-create-section-title,
+.post-create-field-title {
+  margin-bottom: 11px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* 필수 입력 항목의 별표만 빨간색 */
+.post-create-asterisk {
+  color: #e53935;
+  font-weight: 700;
+}
+
+/* ========================================
+   공통 입력창
+======================================== */
+
+.post-create input[type="text"],
+.post-create textarea,
+.post-create select {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 15px;
+  border: 1px solid var(--border-default);
+  border-radius: 9px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.post-create input[type="text"] {
+  min-height: 46px;
+}
+
+.post-create textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.post-create input[type="text"]::placeholder,
+.post-create textarea::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.8;
+}
+
+.post-create input[type="text"]:focus,
+.post-create textarea:focus,
+.post-create select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+/* ========================================
+   이미지 업로드
+======================================== */
+
+.post-create-image-upload {
+  width: 100%;
+  min-height: 180px;
+  border: 1.5px dashed var(--border-default);
+  border-radius: 12px;
+  background-color: var(--bg-secondary);
+  overflow: hidden;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.post-create-image-upload:hover {
+  border-color: var(--color-primary);
+}
+
+/* 업로드 전 */
+.post-create-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: 100%;
+  min-height: 180px;
+  padding: 20px;
+
+  color: var(--text-tertiary);
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.post-create-image-placeholder:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -4px;
+}
+
+.post-create-image-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+
+  font-size: 27px;
+  font-weight: 300;
+}
+
+/* 이미지 미리보기 */
+.post-create-image-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  width: 100%;
+  padding: 18px;
+}
+
+.post-create-image-preview img {
+  display: block;
+  width: 100%;
+  max-width: 550px;
+  max-height: 330px;
+
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* 이미지 변경 / 삭제 버튼 */
+.post-create-image-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.post-create-image-buttons button {
+  min-width: 100px;
+  padding: 9px 15px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background-color: var(--bg-surface);
+  color: var(--color-primary);
+
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.post-create-image-buttons button:hover {
+  background-color: var(--bg-secondary);
+}
+
+.post-create-image-buttons button:last-child {
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   레시피 제목 / 레시피 소개
+======================================== */
+
+.post-create-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.post-create-field input,
+.post-create-field textarea {
+  width: 100%;
+}
+
+/* ========================================
+   재료 / 양념
+======================================== */
+
+/*
+  재료와 양념은 현재 JSX에서
+  post-create-ingredients 클래스를 공유합니다.
+*/
+
+.post-create-ingredients-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+
+  width: 100%;
+  padding: 16px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+}
+
+.post-create-ingredient-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.post-create-ingredient-item input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  min-height: 38px;
+  padding: 8px 10px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background-color: var(--bg-secondary);
+  box-shadow: none;
+}
+
+.post-create-ingredient-item input[type="text"]:focus {
+  border-color: var(--color-primary);
+}
+
+/* 재료 / 양념 추가 버튼 */
+.post-create-add-ingredient {
+  align-self: flex-start;
+  padding: 9px 16px;
+
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  background-color: var(--bg-surface);
+  color: var(--color-primary);
+
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.post-create-add-ingredient:hover {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+/* 재료 / 양념 삭제 버튼 */
+.post-create-remove-ingredient {
+  flex-shrink: 0;
+  padding: 8px 12px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.post-create-remove-ingredient:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* ========================================
+   조리 순서
+======================================== */
+
+.post-create-steps-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+
+  width: 100%;
+  padding: 16px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+}
+
+.post-create-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.post-create-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+
+  background-color: var(--color-accent);
+  color: var(--text-primary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.post-create-step-item input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  min-height: 40px;
+  padding: 8px 10px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background-color: var(--bg-secondary);
+  box-shadow: none;
+}
+
+.post-create-step-item input[type="text"]:focus {
+  border-color: var(--color-primary);
+}
+
+/* 조리 단계 추가 */
+.post-create-add-step {
+  align-self: flex-start;
+  padding: 9px 16px;
+
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+.post-create-add-step:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent) 20%,
+    var(--bg-surface)
+  );
+}
+
+/* 조리 단계 삭제 */
+.post-create-remove-step {
+  flex-shrink: 0;
+  padding: 8px 12px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.post-create-remove-step:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* ========================================
+   조리 정보
+======================================== */
+
+.post-create-info-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.post-create-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.post-create-info-item > div {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.post-create-info-item input[type="text"] {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 15px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 9px;
+  background-color: var(--bg-surface);
+}
+
+/* ========================================
+   카테고리
+======================================== */
+
+.post-create-category-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.post-create-category-item {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.post-create-category-label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.post-create-category-item select {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 38px 12px 15px;
+
+  border: 1px solid var(--border-default);
+  border-radius: 9px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  /* 드롭다운 화살표 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23767676' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  background-size: 16px;
+}
+
+.post-create-category-item select:focus {
+  border-color: var(--color-primary);
+}
+
+.post-create-category-item select:invalid {
+  color: var(--text-tertiary);
+}
+
+.post-create-category-item select option {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ========================================
+   하단 버튼
+======================================== */
+
+.post-create-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 32px;
+}
+
+.post-create-actions button {
+  min-height: 48px;
+  padding: 12px 20px;
+
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* 취소 버튼 */
+.post-create-cancel {
+  flex: 0 0 140px;
+  border: 1px solid var(--color-primary);
+  background-color: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.post-create-cancel:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* 등록 버튼 */
+.post-create-submit {
+  flex: 1;
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.post-create-submit:hover {
+  opacity: 0.88;
+}
+
+.post-create-actions button:active {
+  transform: translateY(1px);
+}
+
+/* 필수 입력 안내 */
+.post-create-required {
+  margin-top: 12px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+/* ========================================
+   태블릿 반응형
+======================================== */
+
+@media (max-width: 768px) {
+  .post-create-container {
+    width: calc(100% - 24px);
+    margin: 20px auto;
+    padding: 24px 20px;
+    border-radius: 24px;
+  }
+
+  .post-create-title {
+    font-size: 22px;
+  }
+
+  .post-create-info-list,
+  .post-create-category-list {
+    gap: 12px;
+  }
+
+  .post-create-actions {
+    gap: 10px;
+  }
+
+  .post-create-cancel {
+    flex-basis: 115px;
+  }
+}
+
+/* ========================================
+   모바일 반응형
+======================================== */
+
+@media (max-width: 480px) {
+  .post-create-container {
+    width: calc(100% - 20px);
+    margin: 14px auto;
+    padding: 22px 16px;
+    border-radius: 20px;
+  }
+
+  .post-create-header {
+    margin-bottom: 24px;
+  }
+
+  .post-create-title {
+    font-size: 20px;
+  }
+
+  .post-create-description {
+    font-size: 12px;
+  }
+
+  .post-create-image,
+  .post-create-field,
+  .post-create-ingredients,
+  .post-create-steps,
+  .post-create-info,
+  .post-create-category {
+    margin-bottom: 22px;
+  }
+
+  .post-create-section-title,
+  .post-create-field-title {
+    font-size: 14px;
+  }
+
+  /* 이미지 */
+  .post-create-image-upload,
+  .post-create-image-placeholder {
+    min-height: 150px;
+  }
+
+  .post-create-image-preview img {
+    max-height: 230px;
+  }
+
+  /* 재료 / 양념 */
+  .post-create-ingredients-box,
+  .post-create-steps-box {
+    padding: 12px;
+  }
+
+  .post-create-ingredient-item,
+  .post-create-step-item {
+    gap: 7px;
+  }
+
+  .post-create-remove-ingredient,
+  .post-create-remove-step {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  /* 조리 순서 */
+  .post-create-step-number {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  /* 조리 정보 */
+  .post-create-info-list {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* 카테고리 */
+  .post-create-category-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* 하단 버튼 */
+  .post-create-actions {
+    gap: 8px;
+    margin-top: 26px;
+  }
+
+  .post-create-cancel {
+    flex-basis: 90px;
+  }
+
+  .post-create-actions button {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
