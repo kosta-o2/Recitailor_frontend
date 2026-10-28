@@ -5,10 +5,7 @@ import AuthCard from "../components/authpage/AuthCard";
 import FormField from "../components/authpage/FormField";
 import ResultBox from "../components/authpage/ResultBox";
 import authStyles from "../components/authpage/Auth.module.css";
-import {
-  findPasswordText,
-  placeholders,
-} from "../components/authpage/authPageData";
+import { findPasswordText, placeholders } from "../constants/authText";
 
 function FindPasswordPage() {
   const [id, setId] = useState("");

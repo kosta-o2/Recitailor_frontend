@@ -7,13 +7,13 @@ import PasswordField from "../components/authpage/PasswordField";
 import PasswordMatchMessage from "../components/authpage/PasswordMatchMessage";
 import ResultBox from "../components/authpage/ResultBox";
 import authStyles from "../components/authpage/Auth.module.css";
-import { getErrorMessage } from "../components/authpage/getErrorMessage";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import {
   resetPasswordText,
   placeholders,
-  validationRules,
   passwordMessages,
-} from "../components/authpage/authPageData";
+} from "../constants/authText";
+import { validationRules } from "../constants/validationRules";
 import { confirmPasswordReset } from "../api/authApi";
 
 function ResetPasswordPage() {

@@ -5,11 +5,8 @@ import AuthCard from "../components/authpage/AuthCard";
 import FormField from "../components/authpage/FormField";
 import ResultBox from "../components/authpage/ResultBox";
 import authStyles from "../components/authpage/Auth.module.css";
-import {
-  findIdText,
-  placeholders,
-  dummyMembers,
-} from "../components/authpage/authPageData";
+import { findIdText, placeholders } from "../constants/authText";
+import { dummyMembers } from "../mocks/authMocks";
 
 // 앞 4자만 보여 주고 나머지는 *로 가린다.
 function maskId(id) {

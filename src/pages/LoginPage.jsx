@@ -4,11 +4,11 @@ import AuthLayout from "../components/authpage/AuthLayout";
 import AuthCard from "../components/authpage/AuthCard";
 import FormField from "../components/authpage/FormField";
 import PasswordField from "../components/authpage/PasswordField";
-import OrDivider from "../components/authpage/OrDivider";
-import authStyles from "../components/authpage/Auth.module.css";
-import { getErrorMessage } from "../components/authpage/getErrorMessage";
-import { loginText, placeholders } from "../components/authpage/authPageData";
+import AuthSocialActions from "../components/authpage/AuthSocialActions";
+import { loginText, placeholders } from "../constants/authText";
 import { login } from "../api/authApi";
+import { useAuthSubmit } from "../hooks/useAuthSubmit";
+import { validateLogin } from "../utils/authValidation";
 import styles from "./LoginPage.module.css";
 
 function LoginPage() {
@@ -17,30 +17,22 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const { submitting, error, setError, submit } = useAuthSubmit(
+    "로그인에 실패했어요. 다시 시도해주세요.",
+  );
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!id.trim() || !password) {
-      setError("아이디와 비밀번호를 입력해주세요.");
+    const message = validateLogin({ id, password });
+    if (message) {
+      setError(message);
       return;
     }
 
-    setError("");
-    setSubmitting(true);
-    try {
+    await submit(async () => {
       await login({ id: id.trim(), password });
       navigate("/");
-    } catch (err) {
-      setError(getErrorMessage(err, "로그인에 실패했어요. 다시 시도해주세요."));
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  function handleGoogleLogin() {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+    });
   }
 
   return (
@@ -96,27 +88,12 @@ function LoginPage() {
           </div>
         </div>
 
-        {error && (
-          <p role="alert" className={authStyles.form_error}>
-            {error}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          className={authStyles.primary_button}
-          disabled={submitting}
-        >
-          로그인
-        </button>
-        <OrDivider />
-        <button
-          type="button"
-          className={authStyles.secondary_button}
-          onClick={handleGoogleLogin}
-        >
-          Google로 시작하기
-        </button>
+        <AuthSocialActions
+          error={error}
+          submitting={submitting}
+          submitLabel="로그인"
+          googleLabel="Google로 시작하기"
+        />
       </AuthCard>
     </AuthLayout>
   );

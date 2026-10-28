@@ -46,32 +46,3 @@ export const passwordMessages = {
   match: "비밀번호가 일치해요.",
   mismatch: "비밀번호가 일치하지 않아요.",
 };
-
-// 회원가입 검증 규칙 (placeholder와 같은 규칙)
-export const validationRules = {
-  id: {
-    pattern: /^[A-Za-z0-9]{4,30}$/,
-    message: "아이디는 영문, 숫자 4~30자로 입력해주세요.",
-  },
-  password: {
-    pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
-    message: "비밀번호는 영문, 숫자, 특수문자를 포함해 8자 이상 입력해주세요.",
-  },
-  nickname: {
-    pattern: /^.{2,30}$/u,
-    message: "닉네임은 2~30자로 입력해주세요.",
-  },
-  email: {
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    message: "50자 이내의 올바른 이메일을 입력해주세요.",
-  },
-};
-
-// 더미 데이터: 중복 확인·아이디 찾기 API가 정해지면 교체한다.
-export const takenIds = ["recipe01", "chefbrio", "admin"];
-export const takenNicknames = ["브리오", "세이지", "요리왕"];
-
-export const dummyMembers = [
-  { email: "recipe01@email.com", id: "recipe01", createdAt: "2026-03-14" },
-  { email: "chef@email.com", id: "chefbrio", createdAt: "2026-05-02" },
-];

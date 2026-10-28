@@ -36,6 +36,11 @@ export async function confirmPasswordReset({ token, newPassword }) {
   return data;
 }
 
+// Google 로그인/가입 (서버의 OAuth 시작 주소로 이동)
+export function startGoogleLogin() {
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+}
+
 // 프론트의 로그인 토큰 삭제
 export function logout() {
   sessionStorage.removeItem("accessToken");
