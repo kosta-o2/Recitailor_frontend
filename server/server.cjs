@@ -2,6 +2,7 @@ const path = require("node:path");
 const dotenv = require("dotenv");
 const jsonServer = require("json-server");
 const { createAuthRouter } = require("./routes/auth.cjs");
+const { createMypageRouter } = require("./routes/mypage.cjs");
 
 // 프로젝트 루트의 .env 읽기
 dotenv.config({
@@ -32,6 +33,16 @@ server.use("/api/auth", createAuthRouter(dataRouter.db));
 server.use("/api/auth", (req, res) => {
   return res.status(404).json({
     message: "존재하지 않는 인증 API입니다.",
+  });
+});
+
+// 마이페이지 API (로그인 필요)
+server.use("/api/mypage", createMypageRouter(dataRouter.db));
+
+// 존재하지 않는 마이페이지 경로 처리
+server.use("/api/mypage", (req, res) => {
+  return res.status(404).json({
+    message: "존재하지 않는 마이페이지 API입니다.",
   });
 });
 

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { validationRules } from "../constants/validationRules";
-import { takenIds, takenNicknames } from "../mocks/authMocks";
-import { signup } from "../api/authApi";
+import { checkId, checkNickname, signup } from "../api/authApi";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { validateSignup } from "../utils/authValidation";
 import { useAuthSubmit } from "./useAuthSubmit";
 
@@ -15,8 +15,8 @@ const initialForm = {
 };
 
 const duplicateTargets = {
-  id: { label: "아이디", taken: takenIds },
-  nickname: { label: "닉네임", taken: takenNicknames },
+  id: { label: "아이디", check: checkId },
+  nickname: { label: "닉네임", check: checkNickname },
 };
 
 // 회원가입 폼 상태, 중복 확인, 제출을 관리한다.
@@ -39,8 +39,8 @@ export function useSignupForm() {
     }
   }
 
-  // 더미 목록과 비교한다. 중복 확인 API가 정해지면 교체한다.
-  function handleDuplicateCheck(name) {
+  // 서버에 중복 여부를 물어본다.
+  async function handleDuplicateCheck(name) {
     const value = form[name].trim();
     const rule = validationRules[name];
 
@@ -49,9 +49,16 @@ export function useSignupForm() {
       return;
     }
 
-    const isTaken = duplicateTargets[name].taken.includes(value);
-    setChecks((prev) => ({ ...prev, [name]: isTaken ? "taken" : "ok" }));
-    setErrors((prev) => ({ ...prev, [name]: undefined }));
+    try {
+      const available = await duplicateTargets[name].check(value);
+      setChecks((prev) => ({ ...prev, [name]: available ? "ok" : "taken" }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    } catch (err) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: getErrorMessage(err, "중복 확인에 실패했어요. 다시 시도해주세요."),
+      }));
+    }
   }
 
   // 필드 아래에 보여줄 메시지. 없으면 null.

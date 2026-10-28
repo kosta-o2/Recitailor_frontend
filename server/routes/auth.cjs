@@ -107,6 +107,14 @@ function createAuthRouter(db) {
       });
     }
 
+    const existingNickname = db.get("members").find({ nickname }).value();
+
+    if (existingNickname) {
+      return res.status(409).json({
+        message: "이미 사용 중인 닉네임입니다.",
+      });
+    }
+
     const existingEmail = db.get("members").find({ email }).value();
 
     if (existingEmail) {
@@ -134,6 +142,39 @@ function createAuthRouter(db) {
       message: "회원가입이 완료되었습니다.",
       member: publicMember(member),
     });
+  });
+
+  // 아이디 중복 확인 (탈퇴 회원 포함)
+  // GET /api/auth/check-id?id=
+  router.get("/check-id", (req, res) => {
+    const id = typeof req.query.id === "string" ? req.query.id.trim() : "";
+
+    if (!id || Array.from(id).length > 30) {
+      return res.status(400).json({
+        message: "아이디는 1자 이상 30자 이하여야 합니다.",
+      });
+    }
+
+    const taken = Boolean(db.get("members").find({ id }).value());
+
+    return res.status(200).json({ available: !taken });
+  });
+
+  // 닉네임 중복 확인 (탈퇴 회원 포함)
+  // GET /api/auth/check-nickname?nickname=
+  router.get("/check-nickname", (req, res) => {
+    const nickname =
+      typeof req.query.nickname === "string" ? req.query.nickname.trim() : "";
+
+    if (!nickname || Array.from(nickname).length > 30) {
+      return res.status(400).json({
+        message: "닉네임은 1자 이상 30자 이하여야 합니다.",
+      });
+    }
+
+    const taken = Boolean(db.get("members").find({ nickname }).value());
+
+    return res.status(200).json({ available: !taken });
   });
 
   // 일반 로그인: 아이디 + 비밀번호
@@ -244,4 +285,6 @@ function createAuthRouter(db) {
 module.exports = {
   createAuthRouter,
   createPasswordResetToken,
+  isActiveMember,
+  isValidPassword,
 };

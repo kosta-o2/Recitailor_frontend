@@ -7,7 +7,6 @@ import FieldMessage from "../components/authpage/FieldMessage";
 import PasswordField from "../components/authpage/PasswordField";
 import PasswordMatchMessage from "../components/authpage/PasswordMatchMessage";
 import DuplicateCheckButton from "../components/authpage/DuplicateCheckButton";
-import AuthSocialActions from "../components/authpage/AuthSocialActions";
 import authStyles from "../components/authpage/Auth.module.css";
 import { signupText, placeholders } from "../constants/authText";
 import { useSignupForm } from "../hooks/useSignupForm";
@@ -123,13 +122,18 @@ function SignupPage() {
           message={renderFieldMessage("email")}
         />
 
-        {/* <AuthSocialActions
-          error={formError}
-          submitting={submitting}
-          submitLabel="가입하기"
-          submitClassName={authStyles.submit}
-          googleLabel="Google로 가입하기"
-        /> */}
+        {formError && (
+          <p role="alert" className={authStyles.form_error}>
+            {formError}
+          </p>
+        )}
+        <button
+          type="submit"
+          className={`${authStyles.primary_button} ${authStyles.submit}`}
+          disabled={submitting}
+        >
+          가입하기
+        </button>
       </AuthCard>
     </AuthLayout>
   );

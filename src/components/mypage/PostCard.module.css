@@ -1,0 +1,99 @@
+.wrapper {
+  position: relative;
+  min-width: 0;
+}
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+}
+
+.thumb {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 88px;
+  border-radius: 10px;
+  background: var(--bg-thumb);
+  color: var(--text-placeholder);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--bg-badge);
+  color: var(--text-label);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.title {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-sub);
+  font-size: 13px;
+}
+
+.dot {
+  color: #c4c8ce;
+}
+
+.like {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-error);
+  cursor: pointer;
+}
+
+.like:hover {
+  background: var(--color-error-soft);
+}
+
+.like:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}

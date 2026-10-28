@@ -1,0 +1,26 @@
+.title_area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bar {
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-accent-bar);
+}
+
+.title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.description {
+  margin: 0;
+  color: var(--text-sub);
+  font-size: 15px;
+}

@@ -12,6 +12,22 @@ export async function signup({ id, nickname, email, password }) {
   return data;
 }
 
+// 아이디 중복 확인: 사용할 수 있으면 true
+export async function checkId(id) {
+  const { data } = await api.get("/auth/check-id", { params: { id } });
+
+  return data.available;
+}
+
+// 닉네임 중복 확인: 사용할 수 있으면 true
+export async function checkNickname(nickname) {
+  const { data } = await api.get("/auth/check-nickname", {
+    params: { nickname },
+  });
+
+  return data.available;
+}
+
 // 로그인 (아이디 + 비밀번호)
 
 export async function login({ id, password }) {
