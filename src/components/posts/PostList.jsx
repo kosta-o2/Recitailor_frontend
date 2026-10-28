@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import "./PostList.css";
-import search from "../../assets/images/search.svg";
+import search from "../../assets/images/Search.svg";
 import ViewList from "./ViewList";
 import Image from "./postUtil/Image";
 import { getPostbyPage } from "../../api/recipePostApi";
