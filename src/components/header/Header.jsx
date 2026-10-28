@@ -17,7 +17,7 @@ function Header() {
             state={{ mode: "search", focusInput: true }}
             className={styles.link}
           >
-            AI 레시피 검색
+            AI 레시피 찾기
           </Link>
           <Link
             to="/"

@@ -52,7 +52,9 @@ function SignupPage() {
           placeholder={placeholders.id}
           value={form.id}
           onChange={handleChange}
-          action={<DuplicateCheckButton onClick={() => handleDuplicateCheck("id")} />}
+          action={
+            <DuplicateCheckButton onClick={() => handleDuplicateCheck("id")} />
+          }
           message={renderFieldMessage("id")}
         />
 
@@ -101,7 +103,9 @@ function SignupPage() {
           value={form.nickname}
           onChange={handleChange}
           action={
-            <DuplicateCheckButton onClick={() => handleDuplicateCheck("nickname")} />
+            <DuplicateCheckButton
+              onClick={() => handleDuplicateCheck("nickname")}
+            />
           }
           message={renderFieldMessage("nickname")}
         />
@@ -119,13 +123,13 @@ function SignupPage() {
           message={renderFieldMessage("email")}
         />
 
-        <AuthSocialActions
+        {/* <AuthSocialActions
           error={formError}
           submitting={submitting}
           submitLabel="가입하기"
           submitClassName={authStyles.submit}
           googleLabel="Google로 가입하기"
-        />
+        /> */}
       </AuthCard>
     </AuthLayout>
   );

@@ -88,12 +88,12 @@ function LoginPage() {
           </div>
         </div>
 
-        <AuthSocialActions
+        {/* <AuthSocialActions
           error={error}
           submitting={submitting}
           submitLabel="로그인"
           googleLabel="Google로 시작하기"
-        />
+        /> */}
       </AuthCard>
     </AuthLayout>
   );

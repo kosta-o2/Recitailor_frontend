@@ -36,7 +36,7 @@ function HeroSection() {
             aria-pressed={mode === "search"}
             onClick={() => handleModeChange("search")}
           >
-            레시피 검색
+            레시피 찾기
           </button>
 
           <button
@@ -65,7 +65,7 @@ function HeroSection() {
             className={styles.search_button}
             onClick={handleExecute}
           >
-            {mode === "search" ? "레시피 찾기" : "AI로 만들기"}
+            {mode === "search" ? " 레시피 찾기" : "AI로 레시피 만들기"}
           </button>
         </div>
       </div>
