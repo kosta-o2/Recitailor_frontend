@@ -11,10 +11,15 @@
   width: 100%;
   border-radius: 10px;
 }
-.simplePostType {
+.simplePostCategorys {
+  display: flex;
+  padding: 8px;
+  gap: 15px;
+}
+.simplePostCategory {
   background-color: var(--color-accent);
   border-radius: 20px;
-  width: 10%;
+  width: auto;
   display: flex;
   padding: 5px;
   justify-content: center;
@@ -22,8 +27,15 @@
 .simplePostInfos {
   display: flex;
   flex-direction: row;
-  margin-left: 8px;
+  margin: 0 8px;
   gap: 0px 8px;
+}
+.simplePostInfosAuthor {
+  display: flex;
+  flex-direction: row;
+  margin: 0 8px;
+  gap: 0px 8px;
+  justify-content: space-between;
 }
 .simplePostInfoImg {
   width: 8pt;
