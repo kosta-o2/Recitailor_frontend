@@ -1,0 +1,379 @@
+const express = require("express");
+const multer = require("multer");
+const fs = require("node:fs");
+const path = require("node:path");
+const { randomUUID } = require("node:crypto");
+const { createRequireAuth } = require("../middleware/requireAuth.cjs");
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_POST_JSON_SIZE = 1024 * 1024;
+const UPLOAD_URL_PREFIX = "/uploads";
+
+const PROTECTED_COLLECTIONS = /^\/(recipes|recipe_post_images)(\/|$)/i;
+
+// 파일 앞부분(시그니처)으로 실제 형식을 판별한다. 클라이언트 MIME/확장자는 믿지 않는다.
+function detectImageExtension(buffer) {
+  if (buffer.length >= 3 && buffer.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))) {
+    return ".jpg";
+  }
+
+  if (
+    buffer.length >= 8 &&
+    buffer
+      .subarray(0, 8)
+      .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  ) {
+    return ".png";
+  }
+
+  return null;
+}
+
+function isNonEmptyString(value, maxLength) {
+  return (
+    typeof value === "string" &&
+    value.trim().length > 0 &&
+    Array.from(value.trim()).length <= maxLength
+  );
+}
+
+function cleanStringList(value, maxItems, maxLength) {
+  if (!Array.isArray(value) || value.length > maxItems) return null;
+
+  const items = [];
+
+  for (const item of value) {
+    if (typeof item !== "string") return null;
+
+    const trimmed = item.trim();
+
+    if (!trimmed) continue;
+    if (Array.from(trimmed).length > maxLength) return null;
+
+    items.push(trimmed);
+  }
+
+  return items;
+}
+
+class ValidationError extends Error {
+  constructor(message, status = 400) {
+    super(message);
+    this.status = status;
+  }
+}
+
+// 게시글 입력값 검증. 허용한 필드만 골라서 반환한다.
+function parsePost(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    throw new ValidationError("게시글 정보가 올바르지 않습니다.");
+  }
+
+  if (!isNonEmptyString(input.title, 100)) {
+    throw new ValidationError("레시피 제목은 1자 이상 100자 이하여야 합니다.");
+  }
+
+  const content = input.content ?? "";
+  const portion = input.portion ?? "";
+
+  if (typeof content !== "string" || Array.from(content).length > 2000) {
+    throw new ValidationError("레시피 소개는 2000자 이하여야 합니다.");
+  }
+
+  if (typeof portion !== "string" || Array.from(portion).length > 30) {
+    throw new ValidationError("인분은 30자 이하여야 합니다.");
+  }
+
+  let time = input.time ?? null;
+
+  if (time !== null) {
+    if (!Number.isInteger(time) || time < 0 || time > 100000) {
+      throw new ValidationError("조리 시간은 0 이상의 정수(분)여야 합니다.");
+    }
+  }
+
+  const ingredients = cleanStringList(
+    input.all_ingredient?.ingredients,
+    100,
+    100,
+  );
+  const sauces = cleanStringList(input.all_ingredient?.sauces ?? [], 100, 100);
+  const steps = cleanStringList(input.recipes, 100, 1000);
+
+  if (!ingredients || ingredients.length === 0) {
+    throw new ValidationError("재료를 한 개 이상 입력해 주세요.");
+  }
+
+  if (!sauces) {
+    throw new ValidationError("양념 정보가 올바르지 않습니다.");
+  }
+
+  if (!steps || steps.length === 0) {
+    throw new ValidationError("조리 순서를 한 단계 이상 입력해 주세요.");
+  }
+
+  if (
+    !isNonEmptyString(input.category?.method, 30) ||
+    !isNonEmptyString(input.category?.type, 30)
+  ) {
+    throw new ValidationError("조리 방식과 요리 종류를 선택해 주세요.");
+  }
+
+  return {
+    title: input.title.trim(),
+    content: content.trim(),
+    portion: portion.trim(),
+    time,
+    all_ingredient: { ingredients, sauces },
+    category: {
+      method: input.category.method.trim(),
+      type: input.category.type.trim(),
+    },
+    recipes: steps,
+  };
+}
+
+function nextId(list) {
+  return list.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1;
+}
+
+function createRecipesRouter(db, { uploadDir }) {
+  const router = express.Router();
+  const requireAuth = createRequireAuth(db);
+
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: MAX_IMAGE_SIZE,
+      files: 1,
+      fields: 5,
+      fieldSize: MAX_POST_JSON_SIZE,
+    },
+  }).single("image");
+
+  // multer 오류를 프론트가 표시할 수 있는 JSON으로 바꾼다.
+  function receiveMultipart(req, res, next) {
+    if (!req.is("multipart/form-data")) return next();
+
+    upload(req, res, (error) => {
+      if (!error) return next();
+
+      if (error.code === "LIMIT_FILE_SIZE") {
+        return res.status(413).json({
+          message: "이미지 크기는 5MB 이하만 가능합니다.",
+        });
+      }
+
+      if (error instanceof multer.MulterError) {
+        return res.status(400).json({
+          message: "업로드 요청이 올바르지 않습니다.",
+        });
+      }
+
+      return next(error);
+    });
+  }
+
+  function images() {
+    return db.get("recipe_post_images");
+  }
+
+  // 조회 응답용: 이미지와 작성자 닉네임을 게시글에 합친다.
+  function createViewBuilder() {
+    const byPost = new Map();
+
+    for (const image of images().value()) {
+      const key = String(image.recipe_posts_id);
+
+      if (!byPost.has(key)) byPost.set(key, []);
+
+      byPost.get(key).push(image);
+    }
+
+    const nicknames = new Map(
+      db
+        .get("members")
+        .value()
+        .filter((member) => member.status === 1 && member.deleted_at === null)
+        .map((member) => [member.id, member.nickname]),
+    );
+
+    return (recipe) => {
+      const linked = byPost.get(String(recipe.id)) ?? [];
+
+      return {
+        ...recipe,
+        author: nicknames.get(recipe.author) ?? recipe.author,
+        images: linked,
+        img_url: linked[0]?.img_url ?? recipe.img_url ?? null,
+      };
+    };
+  }
+
+  // JSON Server 기본 GET 응답에 이미지를 합친다. 페이지네이션/정렬은 그대로 둔다.
+  function decorateRecipeResponse(req, res) {
+    const originalJsonp = res.jsonp.bind(res);
+
+    res.jsonp = (data) => {
+      const build = createViewBuilder();
+
+      if (Array.isArray(data)) {
+        return originalJsonp(
+          data.map((item) =>
+            item && typeof item === "object" ? build(item) : item,
+          ),
+        );
+      }
+
+      if (data && typeof data === "object" && "id" in data) {
+        return originalJsonp(build(data));
+      }
+
+      return originalJsonp(data);
+    };
+  }
+
+  // 게시글 등록 (JSON 또는 multipart/form-data)
+  // POST /api/recipes
+  router.post(
+    "/recipes",
+    requireAuth,
+    receiveMultipart,
+    async (req, res, next) => {
+      let savedFile = null;
+      let recipe = null;
+      let imageRow = null;
+
+      try {
+        let postInput = req.body;
+
+        if (req.is("multipart/form-data")) {
+          try {
+            postInput = JSON.parse(req.body?.post);
+          } catch {
+            throw new ValidationError("게시글 정보가 올바르지 않습니다.");
+          }
+        }
+
+        const post = parsePost(postInput);
+
+        let extension = null;
+
+        if (req.file) {
+          if (req.file.size === 0) {
+            throw new ValidationError("비어 있는 이미지 파일입니다.");
+          }
+
+          extension = detectImageExtension(req.file.buffer);
+
+          if (!extension) {
+            throw new ValidationError("JPG 또는 PNG 이미지만 업로드할 수 있습니다.");
+          }
+        }
+
+        if (req.file) {
+          const filename = `${randomUUID()}${extension}`;
+
+          await fs.promises.mkdir(uploadDir, { recursive: true });
+          await fs.promises.writeFile(
+            path.join(uploadDir, filename),
+            req.file.buffer,
+            { flag: "wx" },
+          );
+
+          savedFile = path.join(uploadDir, filename);
+          imageRow = { img_url: `${UPLOAD_URL_PREFIX}/${filename}` };
+        }
+
+        // 아래 구간은 동기 처리라 ID 발급과 저장 사이에 다른 요청이 끼어들지 않는다.
+        const recipeList = db.get("recipes").value();
+        const now = new Date().toISOString();
+
+        recipe = {
+          id: nextId(recipeList),
+          ...post,
+          author: req.member.id,
+          likes: 0,
+          img_url: null,
+          create_at: now,
+          update_at: now,
+        };
+
+        recipeList.push(recipe);
+
+        if (imageRow) {
+          const imageList = images().value();
+
+          imageRow = {
+            id: nextId(imageList),
+            img_url: imageRow.img_url,
+            recipe_posts_id: recipe.id,
+          };
+          imageList.push(imageRow);
+        }
+
+        db.write();
+
+        const [created] = [recipe].map(createViewBuilder());
+
+        return res.status(201).json(created);
+      } catch (error) {
+        // 게시글·이미지가 일부만 남지 않도록 메모리 상태와 파일을 되돌린다.
+        if (recipe) {
+          const list = db.get("recipes").value();
+          const index = list.indexOf(recipe);
+
+          if (index !== -1) list.splice(index, 1);
+        }
+
+        if (imageRow?.id) {
+          const list = images().value();
+          const index = list.indexOf(imageRow);
+
+          if (index !== -1) list.splice(index, 1);
+        }
+
+        if (savedFile) {
+          await fs.promises.rm(savedFile, { force: true }).catch(() => {});
+        }
+
+        if (error instanceof ValidationError) {
+          return res.status(error.status).json({ message: error.message });
+        }
+
+        return next(error);
+      }
+    },
+  );
+
+  // 게시글/이미지 데이터의 나머지 쓰기는 모두 차단한다.
+  // (검증·소유권 검사를 우회하는 기본 CRUD, X-HTTP-Method-Override 포함)
+  router.use((req, res, next) => {
+    if (
+      PROTECTED_COLLECTIONS.test(req.path) &&
+      (!["GET", "HEAD", "OPTIONS"].includes(req.method) ||
+        req.get("X-HTTP-Method-Override"))
+    ) {
+      return res.status(403).json({
+        message: "이 경로로는 데이터를 변경할 수 없습니다.",
+      });
+    }
+
+    if (
+      /^\/recipes(\/|$)/i.test(req.path) &&
+      ["GET", "HEAD"].includes(req.method)
+    ) {
+      decorateRecipeResponse(req, res);
+    }
+
+    return next();
+  });
+
+  return router;
+}
+
+module.exports = {
+  createRecipesRouter,
+  detectImageExtension,
+  MAX_IMAGE_SIZE,
+};
