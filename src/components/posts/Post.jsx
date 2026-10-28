@@ -73,7 +73,9 @@ function Post() {
                 {ToggleLikeView()}
               </div>
               <div className="titles">
-                <div className="author">by {author}</div>
+                <div className="author">
+                  by {author ? author : "삭제된 계정입니다."}
+                </div>
                 <div className="create_at">
                   작성일: {create_at?.slice(0, 10)}
                 </div>
