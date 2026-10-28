@@ -12,10 +12,18 @@ function Header() {
           <span className={styles.logo_text}>recitailor</span>
         </Link>
         <nav>
-          <Link to="recipes/search" className={styles.link}>
+          <Link
+            to="/"
+            state={{ mode: "search", focusInput: true }}
+            className={styles.link}
+          >
             AI 레시피 검색
           </Link>
-          <Link to="recipes/search" className={styles.link}>
+          <Link
+            to="/"
+            state={{ mode: "generate", focusInput: true }}
+            className={styles.link}
+          >
             AI 레시피 생성
           </Link>
           <Link to="/post" className={styles.link}>
