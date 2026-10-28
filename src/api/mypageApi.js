@@ -1,4 +1,5 @@
 import api from "./axios";
+import { setSessionNickname } from "./session";
 
 // 내 정보와 활동 개수 조회
 export async function getMyInfo() {
@@ -10,6 +11,8 @@ export async function getMyInfo() {
 // 닉네임 수정
 export async function updateNickname(nickname) {
   const { data } = await api.patch("/mypage", { nickname });
+
+  setSessionNickname(data.member.nickname);
 
   return data;
 }

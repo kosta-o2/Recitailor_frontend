@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { isActiveMember, isValidPassword } = require("./auth.cjs");
+const { isValidPassword } = require("./auth.cjs");
+const { createRequireAuth } = require("../middleware/requireAuth.cjs");
 
 const PER_PAGE = 10;
 
@@ -69,36 +69,8 @@ function createMypageRouter(db) {
     };
   }
 
-  // 모든 마이페이지 API는 로그인 토큰이 필요하다. 회원은 토큰의 sub로만 정한다.
-  router.use((req, res, next) => {
-    const [scheme, token] = (req.get("Authorization") || "").split(" ");
-
-    if (scheme !== "Bearer" || !token) {
-      return res.status(401).json({ message: "로그인이 필요합니다." });
-    }
-
-    let payload;
-
-    try {
-      payload = jwt.verify(token, process.env.JWT_SECRET, {
-        algorithms: ["HS256"],
-        audience: "access",
-      });
-    } catch {
-      return res.status(401).json({
-        message: "로그인이 만료되었거나 유효하지 않습니다.",
-      });
-    }
-
-    const member = members().find({ id: payload.sub }).value();
-
-    if (!isActiveMember(member)) {
-      return res.status(401).json({ message: "사용할 수 없는 계정입니다." });
-    }
-
-    req.member = member;
-    return next();
-  });
+  // 모든 마이페이지 API는 로그인 토큰이 필요하다.
+  router.use(createRequireAuth(db));
 
   // 내 정보 조회
   // GET /api/mypage

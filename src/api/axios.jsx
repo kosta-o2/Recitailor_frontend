@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearSession } from "./session";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -13,6 +14,11 @@ api.interceptors.request.use((config) => {
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  // FormData는 브라우저가 boundary가 포함된 Content-Type을 직접 설정하게 한다.
+  if (config.data instanceof FormData) {
+    config.headers.delete("Content-Type");
   }
 
   return config;
@@ -31,7 +37,7 @@ api.interceptors.response.use(
       !isAuthRequest &&
       sessionStorage.getItem("accessToken")
     ) {
-      sessionStorage.removeItem("accessToken");
+      clearSession();
 
       if (window.location.pathname !== "/login") {
         window.location.assign("/login");
