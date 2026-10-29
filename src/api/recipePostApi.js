@@ -8,6 +8,7 @@ export const getPostbyPage = async ({
   sortBy,
   sortOrder,
   keyword = "",
+  kind,
 }) => {
   const currentPage = Math.max(1, Number(page) || 1);
 
@@ -16,7 +17,9 @@ export const getPostbyPage = async ({
     limit,
     keyword,
   };
-
+  if (kind) {
+    params.kind = kind;
+  }
   if (sortBy && sortOrder) {
     params.sortBy = sortBy;
     params.sortOrder = sortOrder;

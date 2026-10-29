@@ -3,12 +3,14 @@ import PageTitle from "../components/mypage/PageTitle";
 import PostCard from "../components/mypage/PostCard";
 import Pagination from "../components/mypage/Pagination";
 import EmptyState from "../components/mypage/EmptyState";
+import KindFilter from "../components/mypage/KindFilter";
 import { addFavorite, getMyFavorites, removeFavorite } from "../api/mypageApi";
 import { getErrorMessage } from "../utils/getErrorMessage";
 import styles from "../components/mypage/MyPage.module.css";
 
 function MyLikesPage() {
   const [page, setPage] = useState(1);
+  const [kind, setKind] = useState("all");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   // 하트를 누른 카드의 상태. 카드는 그대로 두고 하트와 좋아요 수만 바꾼다.
@@ -17,7 +19,7 @@ function MyLikesPage() {
   useEffect(() => {
     let cancelled = false;
 
-    getMyFavorites(page)
+    getMyFavorites(page, kind === "all" ? undefined : kind)
       .then((data) => {
         if (cancelled) return;
         setResult(data);
@@ -33,7 +35,12 @@ function MyLikesPage() {
     return () => {
       cancelled = true;
     };
-  }, [page]);
+  }, [page, kind]);
+
+  function handleKindChange(next) {
+    setKind(next);
+    setPage(1);
+  }
 
   async function handleToggleLike(recipe) {
     const liked = toggled[recipe.id]?.liked ?? true;
@@ -59,6 +66,8 @@ function MyLikesPage() {
         description="좋아요를 누른 레시피를 모아봤어요. 하트를 누르면 좋아요가 취소돼요."
       />
 
+      <KindFilter value={kind} onChange={handleKindChange} />
+
       {error && (
         <p role="alert" className={styles.error}>
           {error}
@@ -66,7 +75,14 @@ function MyLikesPage() {
       )}
       {!result && !error && <p className={styles.status}>불러오는 중이에요.</p>}
 
-      {result && result.total === 0 && (
+      {result && result.total === 0 && kind !== "all" && (
+        <EmptyState
+          title="해당하는 게시글이 없어요"
+          description="다른 구분을 선택해 보세요."
+        />
+      )}
+
+      {result && result.total === 0 && kind === "all" && (
         <EmptyState
           title="아직 좋아요한 레시피가 없어요"
           description="마음에 드는 레시피에 좋아요를 누르면 여기에 모여요."
