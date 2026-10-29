@@ -28,6 +28,7 @@ export async function fetchSearch(query) {
     const { data } = await api.get("/recipes", {
       params: {
         title_like: pattern,
+        kind: "user",
         _sort: "create_at",
         _order: "desc",
         _limit: USER_RECIPE_LIMIT,

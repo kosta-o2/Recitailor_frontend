@@ -2,12 +2,16 @@ import api from "./axios";
 
 const endpoint = "/recipes";
 // 레시피 목록 조회 (JSON Server 0.17 페이지 응답)
-export async function getPostbyPage({ page, limit, sortBy, sortOrder }) {
+// kind: "user"(일반 글) | "ai"(AI 글) | 없으면 전체
+export async function getPostbyPage({ page, limit, sortBy, sortOrder, kind }) {
   const currentPage = Math.max(1, Number(page) || 1);
   const params = {
     _page: page,
     _limit: limit,
   };
+  if (kind) {
+    params.kind = kind;
+  }
   if (sortBy && sortOrder) {
     params._sort = sortBy;
     params._order = sortOrder;

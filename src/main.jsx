@@ -44,7 +44,7 @@ const router = createBrowserRouter([
           </RequireAuth>
         ),
         children: [
-          { index: true, element: <PostList /> },
+          { index: true, element: <PostList key="user" kind="user" /> },
           { path: ":id", element: <Post /> },
           { path: "create", element: <PostCreate /> },
           { path: "edit/:id", element: <PostCreatePage /> },
@@ -60,6 +60,7 @@ const router = createBrowserRouter([
         children: [
           { path: "search", element: <AiSearchResultsPage /> },
           { path: "create", element: <AiCreateResultsPage /> },
+          { path: "posts", element: <PostList key="ai" kind="ai" /> },
           { path: "recipes/:tempId", element: <AiRecipeDetailPage /> },
         ],
       },
