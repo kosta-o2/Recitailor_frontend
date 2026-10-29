@@ -1993,6 +1993,34 @@
       "img_url": null,
       "create_at": "2026-10-29T06:27:32.887Z",
       "update_at": "2026-10-29T06:27:32.887Z"
+    },
+    {
+      "id": 55,
+      "title": "zxc",
+      "post_type": "normal",
+      "content": "zcxas",
+      "portion": "5",
+      "time": 5,
+      "all_ingredient": {
+        "ingredients": [
+          "asd"
+        ],
+        "sauces": [
+          "123"
+        ]
+      },
+      "category": {
+        "method": "회",
+        "type": "양식"
+      },
+      "recipes": [
+        "444"
+      ],
+      "author": "asdf",
+      "likes": 0,
+      "img_url": null,
+      "create_at": "2026-10-29T08:47:00.196Z",
+      "update_at": "2026-10-29T08:47:00.196Z"
     }
   ],
   "members": [

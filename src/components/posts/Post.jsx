@@ -17,7 +17,7 @@ function Post() {
   const [post, setPost] = useState([]);
   const [isLike, setLike] = useState(false);
   const nav = useNavigate();
-  const { id: userId, nickName } = getSessionMember();
+  const { id: userId, nickname } = getSessionMember();
 
   useEffect(() => {
     const getDetail = async (params) => {
@@ -97,12 +97,18 @@ function Post() {
         <div className="posts">
           <div className="postCreate">
             <div className="PostCreateTitle">게시글생성</div>
-            <button className="postsFix" onClick={postFix}>
-              수정
-            </button>
-            <button className="postDel" onClick={postDel}>
-              삭제
-            </button>
+            {author === nickname ? (
+              <>
+                <button className="postsFix" onClick={postFix}>
+                  수정
+                </button>
+                <button className="postDel" onClick={postDel}>
+                  삭제
+                </button>
+              </>
+            ) : (
+              ""
+            )}
           </div>
           <div className="header">
             <div>
