@@ -3,12 +3,16 @@ const multer = require("multer");
 const fs = require("node:fs");
 const path = require("node:path");
 const { randomUUID } = require("node:crypto");
-const { createRequireAuth } = require("../middleware/requireAuth.cjs");
+const {
+  createRequireAuth,
+  createOptionalAuth,
+} = require("../middleware/requireAuth.cjs");
+const { createFavoriteStore } = require("../lib/favorites.cjs");
+const { AI_POST_TYPES } = require("../lib/postTypes.cjs");
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_POST_JSON_SIZE = 1024 * 1024;
 const UPLOAD_URL_PREFIX = "/uploads";
-const AI_POST_TYPES = ["ai_search", "ai_create"];
 
 const PROTECTED_COLLECTIONS = /^\/(recipes|recipe_post_images)(\/|$)/i;
 
@@ -150,6 +154,8 @@ function nextId(list) {
 function createRecipesRouter(db, { uploadDir }) {
   const router = express.Router();
   const requireAuth = createRequireAuth(db);
+  const optionalAuth = createOptionalAuth(db);
+  const favorites = createFavoriteStore(db);
 
   const upload = multer({
     storage: multer.memoryStorage(),
@@ -188,9 +194,11 @@ function createRecipesRouter(db, { uploadDir }) {
     return db.get("recipe_post_images");
   }
 
-  // 조회 응답용: 이미지와 작성자 닉네임을 게시글에 합친다.
-  function createViewBuilder() {
+  // 조회 응답용: 이미지, 작성자 닉네임, 좋아요 수(favorites 집계)와 내 좋아요 여부를 게시글에 합친다.
+  function createViewBuilder(memberId = null) {
     const byPost = new Map();
+    const likeCounts = favorites.countsByPost();
+    const likedIds = memberId ? favorites.likedPostIds(memberId) : new Set();
 
     for (const image of images().value()) {
       const key = String(image.recipe_posts_id);
@@ -214,6 +222,8 @@ function createRecipesRouter(db, { uploadDir }) {
       return {
         ...recipe,
         author: nicknames.get(recipe.author) ?? recipe.author,
+        likes: likeCounts.get(String(recipe.id)) ?? 0,
+        liked: likedIds.has(String(recipe.id)),
         images: linked,
         img_url: linked[0]?.img_url ?? recipe.img_url ?? null,
       };
@@ -225,7 +235,7 @@ function createRecipesRouter(db, { uploadDir }) {
     const originalJsonp = res.jsonp.bind(res);
 
     res.jsonp = (data) => {
-      const build = createViewBuilder();
+      const build = createViewBuilder(req.member?.id);
 
       if (Array.isArray(data)) {
         return originalJsonp(
@@ -326,7 +336,7 @@ function createRecipesRouter(db, { uploadDir }) {
 
         db.write();
 
-        const [created] = [recipe].map(createViewBuilder());
+        const [created] = [recipe].map(createViewBuilder(req.member.id));
 
         return res.status(201).json(created);
       } catch (error) {
@@ -456,8 +466,10 @@ function createRecipesRouter(db, { uploadDir }) {
         );
 
         // 9. 게시글 수정
+        // post_type은 수정할 수 없다. (AI 글이 일반 글로 바뀌지 않게 기존 값을 유지)
         Object.assign(recipe, {
           ...post,
+          post_type: recipe.post_type || "normal",
           update_at: new Date().toISOString(),
         });
 
@@ -487,7 +499,7 @@ function createRecipesRouter(db, { uploadDir }) {
         db.write();
 
         // 12. 수정된 게시글 반환용 데이터 생성
-        const result = createViewBuilder()(recipe);
+        const result = createViewBuilder(req.member.id)(recipe);
         // 13. 교체된 기존 이미지 파일 삭제
         if (removeImage || newImageUrl) {
           for (const oldImage of linkedImages) {
@@ -585,6 +597,9 @@ function createRecipesRouter(db, { uploadDir }) {
 
       db.get("recipe_post_images").remove({ recipe_posts_id: id }).write();
 
+      // 삭제된 게시글의 좋아요도 함께 지운다. (같은 id로 새 글이 생겨도 이어받지 않게)
+      favorites.removeByPost(id);
+
       // 저장된 이미지 파일 삭제
       for (const image of linkedImages) {
         if (!image.img_url?.startsWith(`${UPLOAD_URL_PREFIX}/`)) continue;
@@ -620,6 +635,33 @@ function createRecipesRouter(db, { uploadDir }) {
       /^\/recipes(\/|$)/i.test(req.path) &&
       ["GET", "HEAD"].includes(req.method)
     ) {
+      // JSON Server가 정렬(_sort=likes)·필터(post_type)할 수 있게 메모리 값을 맞춰 둔다.
+      // likes는 favorites 집계값, post_type이 없는 기존 글은 normal로 본다.
+      const likeCounts = favorites.countsByPost();
+
+      for (const recipe of db.get("recipes").value()) {
+        recipe.likes = likeCounts.get(String(recipe.id)) ?? 0;
+        recipe.post_type = recipe.post_type || "normal";
+      }
+
+      // 목록 구분: ?kind=user 는 일반 글, ?kind=ai 는 AI 글만 (없으면 전체)
+      if (req.query.kind !== undefined && /^\/recipes\/?$/i.test(req.path)) {
+        const kind = req.query.kind;
+
+        delete req.query.kind;
+
+        if (kind === "user") {
+          req.query.post_type = "normal";
+        } else if (kind === "ai") {
+          req.query.post_type = AI_POST_TYPES;
+        } else {
+          return res.status(400).json({
+            message: "kind는 user 또는 ai여야 합니다.",
+          });
+        }
+      }
+
+      optionalAuth(req, res, () => {});
       decorateRecipeResponse(req, res);
     }
 

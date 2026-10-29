@@ -34,16 +34,20 @@ export async function withdraw(password) {
   return data;
 }
 
-// 내가 작성한 레시피 목록
-export async function getMyRecipes(page = 1) {
-  const { data } = await api.get("/mypage/recipes", { params: { page } });
+// 내가 작성한 레시피 목록. kind: "user" | "ai" | 없으면 전체
+export async function getMyRecipes(page = 1, kind) {
+  const { data } = await api.get("/mypage/recipes", {
+    params: { page, kind },
+  });
 
   return data;
 }
 
-// 좋아요한 레시피 목록
-export async function getMyFavorites(page = 1) {
-  const { data } = await api.get("/mypage/favorites", { params: { page } });
+// 좋아요한 레시피 목록. kind: "user" | "ai" | 없으면 전체
+export async function getMyFavorites(page = 1, kind) {
+  const { data } = await api.get("/mypage/favorites", {
+    params: { page, kind },
+  });
 
   return data;
 }

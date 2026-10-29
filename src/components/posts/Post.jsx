@@ -9,6 +9,8 @@ import Image from "./postUtil/Image";
 import { useNavigate, useParams } from "react-router";
 import { DeletePost, getPostbyId } from "../../api/recipePostApi";
 import { getSessionMember } from "../../api/session";
+import { boardPath } from "../../utils/boardPath";
+import { addFavorite, removeFavorite } from "../../api/mypageApi";
 
 function Post() {
   const paramsId = useParams().id;
@@ -16,6 +18,8 @@ function Post() {
   const [recipeVisible, setRecipeVisible] = useState(false);
   const [post, setPost] = useState([]);
   const [isLike, setLike] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [likeSaving, setLikeSaving] = useState(false);
   const nav = useNavigate();
   const { id: userId, nickName } = getSessionMember();
 
@@ -24,6 +28,8 @@ function Post() {
       const res = await getPostbyId(params);
       // console.log(res);
       setPost(res);
+      setLike(Boolean(res.liked));
+      setLikes(res.likes ?? 0);
     };
     getDetail(paramsId);
   }, [paramsId]);
@@ -46,20 +52,34 @@ function Post() {
   };
   const ToggleLikeView = () => {
     return (
-      <img
-        src={isLike ? like : empty_heart}
-        alt="좋아요 토글"
-        className="toggleLike"
-        onClick={() => {
-          toggleLike();
-          console.log(isLike);
-        }}
-      />
+      <div className="likeBox">
+        <img
+          src={isLike ? like : empty_heart}
+          alt="좋아요 토글"
+          className="toggleLike"
+          onClick={toggleLike}
+        />
+        <span className="likeCount">{likes}</span>
+      </div>
     );
   };
-  const toggleLike = () => {
-    //TODO 좋아요 기능 구현
-    setLike(!isLike);
+  // 좋아요 추가/해제. 서버가 돌려준 집계 값으로 하트와 개수를 맞춘다.
+  const toggleLike = async () => {
+    if (likeSaving || !id) return;
+
+    setLikeSaving(true);
+
+    try {
+      const data = isLike ? await removeFavorite(id) : await addFavorite(id);
+
+      setLike(data.liked);
+      setLikes(data.likes);
+    } catch (error) {
+      console.error("좋아요 변경 실패:", error);
+      alert("좋아요를 바꾸지 못했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setLikeSaving(false);
+    }
   };
 
   const postFix = () => {
@@ -85,7 +105,7 @@ function Post() {
       const re = await DeletePost(post.id);
       console.log(re);
       alert("게시글이 삭제되었습니다.");
-      nav("/post");
+      nav(boardPath(post.post_type));
     } catch (error) {
       console.error("게시글 삭제 실패:", error);
       alert("게시글 삭제 중 오류가 발생했습니다.");

@@ -5,10 +5,25 @@ import ViewList from "./ViewList";
 import Image from "./postUtil/Image";
 import { getPostbyPage } from "../../api/recipePostApi";
 import { useDispatch, useSelector } from "react-redux";
-import { setPage, setSort } from "../../features/postSlice";
+import { setKind, setPage, setSort } from "../../features/postSlice";
 import { useNavigate } from "react-router";
 
-function PostList() {
+const BOARDS = {
+  user: {
+    title: "레시피게시판",
+    description: "다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.",
+    canWrite: true,
+  },
+  ai: {
+    title: "AI 레시피 게시판",
+    description: "AI가 만든 레시피를 둘러보고 마음에 드는 레시피에 좋아요를 눌러보세요.",
+    canWrite: false,
+  },
+};
+
+// kind: "user"(일반 레시피 게시판) | "ai"(AI 레시피 게시판)
+function PostList({ kind = "user" }) {
+  const board = BOARDS[kind] ?? BOARDS.user;
   const nav = useNavigate();
   const [inputBox, setInputBox] = useState("");
   const inputRef = useRef();
@@ -24,10 +39,22 @@ function PostList() {
   const pageGroup = Math.ceil(lastPage / PAGE_GROUP_SIZE); //페이지 그룹의 수
 
   const dispatch = useDispatch();
-  const { sortBy, sortOrder, page, limit } = useSelector(
-    (state) => state.posts,
-  );
+  const {
+    sortBy,
+    sortOrder,
+    page,
+    limit,
+    kind: listKind,
+  } = useSelector((state) => state.posts);
+
   useEffect(() => {
+    dispatch(setKind(kind));
+  }, [dispatch, kind]);
+
+  useEffect(() => {
+    // 게시판이 바뀐 직후에는 이전 게시판의 페이지/정렬이므로 setKind 반영 뒤에 조회한다.
+    if (listKind !== kind) return;
+
     const fetchPosts = async () => {
       try {
         const data = await getPostbyPage({
@@ -35,6 +62,7 @@ function PostList() {
           limit,
           sortBy,
           sortOrder,
+          kind,
         });
 
         setResponse(data);
@@ -44,7 +72,7 @@ function PostList() {
     };
 
     fetchPosts();
-  }, [page, limit, sortBy, sortOrder]);
+  }, [page, limit, sortBy, sortOrder, kind, listKind]);
 
   const sortEvent = (sort) => {
     dispatch(
@@ -133,20 +161,20 @@ function PostList() {
     <div className="postList">
       <div className="postHeader">
         <div className="postHeaderText">
-          <p className="postTitle">레시피게시판</p>
-          <p className="postDescription">
-            다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.
-          </p>
+          <p className="postTitle">{board.title}</p>
+          <p className="postDescription">{board.description}</p>
         </div>
-        <button
-          type="button"
-          className="postCreateButton"
-          onClick={() => {
-            nav("/post/create");
-          }}
-        >
-          + 게시글 작성
-        </button>
+        {board.canWrite && (
+          <button
+            type="button"
+            className="postCreateButton"
+            onClick={() => {
+              nav("/post/create");
+            }}
+          >
+            + 게시글 작성
+          </button>
+        )}
       </div>
       <div className="searchBox">
         <div className="searchLine">
