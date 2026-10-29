@@ -2,34 +2,41 @@ import api from "./axios";
 
 const endpoint = "/recipes";
 // 레시피 목록 조회 (JSON Server 0.17 페이지 응답)
-// kind: "user"(일반 글) | "ai"(AI 글) | 없으면 전체
-export async function getPostbyPage({ page, limit, sortBy, sortOrder, kind }) {
+export const getPostbyPage = async ({
+  page,
+  limit,
+  sortBy,
+  sortOrder,
+  keyword = "",
+  kind,
+}) => {
   const currentPage = Math.max(1, Number(page) || 1);
+
   const params = {
-    _page: page,
-    _limit: limit,
+    page: currentPage,
+    limit,
+    keyword,
   };
   if (kind) {
     params.kind = kind;
   }
   if (sortBy && sortOrder) {
-    params._sort = sortBy;
-    params._order = sortOrder;
+    params.sortBy = sortBy;
+    params.sortOrder = sortOrder;
   }
-  const { data, headers } = await api.get(endpoint, { params });
 
-  const items = Number(headers["x-total-count"]); //아이템 최대 수
-  const pages = Math.ceil(items / limit);
+  const { data } = await api.get(`${endpoint}/search`, { params });
+
   return {
-    data,
+    data: data.data,
     first: 1,
-    items,
-    last: pages,
-    next: currentPage < pages ? currentPage + 1 : null,
-    pages,
+    items: data.total,
+    last: data.last,
+    next: currentPage < data.last ? currentPage + 1 : null,
+    pages: data.last,
     prev: currentPage > 1 ? currentPage - 1 : null,
   };
-}
+};
 
 // 게시글 정보 조회
 export async function getPostbyId(id) {

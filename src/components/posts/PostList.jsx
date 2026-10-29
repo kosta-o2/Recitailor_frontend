@@ -26,6 +26,7 @@ function PostList({ kind = "user" }) {
   const board = BOARDS[kind] ?? BOARDS.user;
   const nav = useNavigate();
   const [inputBox, setInputBox] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
   const inputRef = useRef();
   const [response, setResponse] = useState();
   const sortList = [
@@ -51,7 +52,25 @@ function PostList({ kind = "user" }) {
     dispatch(setKind(kind));
   }, [dispatch, kind]);
 
+ 
+  const handleSearchChange = (value) => {
+    setInputBox(value);
+
+    // 검색어 변경 시 첫 페이지로 이동
+    dispatch(setPage(1));
+    setCurrentPageGroup(1);
+  };
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchKeyword(inputBox.trim());
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [inputBox]);
+  
+  useEffect(() => {
+    let ignore = false;
+    
     // 게시판이 바뀐 직후에는 이전 게시판의 페이지/정렬이므로 setKind 반영 뒤에 조회한다.
     if (listKind !== kind) return;
 
@@ -63,16 +82,25 @@ function PostList({ kind = "user" }) {
           sortBy,
           sortOrder,
           kind,
+          keyword: searchKeyword,
         });
 
-        setResponse(data);
+        if (!ignore) {
+          setResponse(data);
+        }
       } catch (error) {
-        console.error("게시글 조회 실패:", error);
+        if (!ignore) {
+          console.error("게시글 조회 실패:", error);
+        }
       }
     };
 
     fetchPosts();
-  }, [page, limit, sortBy, sortOrder, kind, listKind]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [page, limit, sortBy, sortOrder, kind, listKind, searchKeyword]);
 
   const sortEvent = (sort) => {
     dispatch(
@@ -141,7 +169,7 @@ function PostList({ kind = "user" }) {
           );
         },
         "〉",
-        currentPageGroup >= 4,
+        currentPageGroup >= pageGroup,
       ),
     );
     re.push(
@@ -151,7 +179,7 @@ function PostList({ kind = "user" }) {
           setCurrentPageGroup(pageGroup);
         },
         "〉〉",
-        currentPageGroup >= 4,
+        currentPageGroup >= pageGroup,
       ),
     );
     return re;
@@ -181,9 +209,9 @@ function PostList({ kind = "user" }) {
           <Image src={search} alt="검색" />
           <input
             type="text"
-            placeholder="레시피명, 재료, 작성자로 검색  "
+            placeholder="레시피명, 재료/양념, 소개글로 검색"
             onChange={(e) => {
-              setInputBox(e.target.value);
+              handleSearchChange(e.target.value);
             }}
             value={inputBox}
             ref={inputRef}
@@ -191,8 +219,8 @@ function PostList({ kind = "user" }) {
         </div>
         <p
           onClick={() => {
-            setInputBox("");
-            inputRef.current.focus();
+            handleSearchChange("");
+            inputRef.current?.focus();
           }}
         >
           X
@@ -215,8 +243,18 @@ function PostList({ kind = "user" }) {
           );
         })}
       </div>
-      <ViewList data={response?.data} />
-      <div className="postPagination">{ViewNumber()}</div>
+      {response?.data?.length > 0 ? (
+        <>
+          <ViewList data={response.data} />
+          <div className="postPagination">{ViewNumber()}</div>
+        </>
+      ) : (
+        <p className="postEmpty">
+          {searchKeyword
+            ? "검색 결과가 없습니다."
+            : "등록된 게시글이 없습니다."}
+        </p>
+      )}
     </div>
   );
 }
