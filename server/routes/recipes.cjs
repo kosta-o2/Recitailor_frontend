@@ -351,6 +351,195 @@ function createRecipesRouter(db, { uploadDir }) {
     },
   );
 
+  // 게시글 수정
+  // PATCH /api/recipes/:id
+  router.patch(
+    "/recipes/:id",
+    requireAuth,
+    receiveMultipart,
+    async (req, res, next) => {
+      let savedFile = null;
+      let originalRecipe = null;
+      let originalImages = null;
+      let updatedRecipe = null;
+
+      try {
+        // 1. 게시글 ID 검증
+        const id = Number(req.params.id);
+
+        if (!Number.isSafeInteger(id) || id <= 0) {
+          throw new ValidationError("올바르지 않은 게시글 ID입니다.");
+        }
+
+        // 2. 기존 게시글 조회
+        const recipe = db.get("recipes").find({ id }).value();
+
+        if (!recipe) {
+          return res.status(404).json({
+            message: "게시글을 찾을 수 없습니다.",
+          });
+        }
+
+        // 3. 작성자 본인 확인
+        if (String(recipe.author) !== String(req.member.id)) {
+          return res.status(403).json({
+            message: "본인이 작성한 게시글만 수정할 수 있습니다.",
+          });
+        }
+
+        // 4. FormData에서 게시글 데이터 추출
+        let postInput = req.body;
+
+        if (req.is("multipart/form-data")) {
+          try {
+            postInput = JSON.parse(req.body?.post);
+          } catch {
+            throw new ValidationError("게시글 정보가 올바르지 않습니다.");
+          }
+        }
+
+        // 5. 기존 검증 함수 재사용
+        const post = parsePost(postInput);
+
+        // 6. 새로운 이미지 파일 검증
+        let extension = null;
+
+        if (req.file) {
+          if (req.file.size === 0) {
+            throw new ValidationError("비어 있는 이미지 파일입니다.");
+          }
+
+          extension = detectImageExtension(req.file.buffer);
+
+          if (!extension) {
+            throw new ValidationError(
+              "JPG 또는 PNG 이미지만 업로드할 수 있습니다.",
+            );
+          }
+        }
+        const removeImage = req.body?.removeImage === "true";
+        // 7. 새로운 이미지 저장
+        let newImageUrl = null;
+
+        if (req.file) {
+          const filename = `${randomUUID()}${extension}`;
+
+          await fs.promises.mkdir(uploadDir, {
+            recursive: true,
+          });
+
+          savedFile = path.join(uploadDir, filename);
+
+          await fs.promises.writeFile(savedFile, req.file.buffer, {
+            flag: "wx",
+          });
+
+          newImageUrl = `${UPLOAD_URL_PREFIX}/${filename}`;
+        }
+
+        // 8. 기존 데이터 백업
+        originalRecipe = { ...recipe };
+
+        const imageList = images().value();
+
+        originalImages = imageList.map((image) => ({ ...image }));
+
+        const linkedImages = imageList.filter(
+          (image) => String(image.recipe_posts_id) === String(id),
+        );
+
+        // 9. 게시글 수정
+        Object.assign(recipe, {
+          ...post,
+          update_at: new Date().toISOString(),
+        });
+
+        updatedRecipe = recipe;
+
+        // 10. 새 이미지가 있다면 기존 이미지 정보 교체
+        // 이미지 삭제 요청 또는 새 이미지 업로드 시
+        if (removeImage || newImageUrl) {
+          // 기존 이미지 DB 정보 삭제
+          for (let i = imageList.length - 1; i >= 0; i--) {
+            if (String(imageList[i].recipe_posts_id) === String(id)) {
+              imageList.splice(i, 1);
+            }
+          }
+
+          // 새 이미지가 있을 경우에만 등록
+          if (newImageUrl) {
+            imageList.push({
+              id: nextId(originalImages),
+              img_url: newImageUrl,
+              recipe_posts_id: id,
+            });
+          }
+        }
+
+        // 11. DB 저장
+        db.write();
+
+        // 12. 수정된 게시글 반환용 데이터 생성
+        const result = createViewBuilder()(recipe);
+        // 13. 교체된 기존 이미지 파일 삭제
+        if (removeImage || newImageUrl) {
+          for (const oldImage of linkedImages) {
+            if (!oldImage.img_url?.startsWith(`${UPLOAD_URL_PREFIX}/`)) {
+              continue;
+            }
+
+            const filename = path.basename(oldImage.img_url);
+            const filePath = path.join(uploadDir, filename);
+
+            await fs.promises
+              .rm(filePath, {
+                force: true,
+              })
+              .catch((error) => {
+                console.error("기존 이미지 삭제 실패:", error);
+              });
+          }
+        }
+
+        return res.status(200).json({
+          message: "게시글이 수정되었습니다.",
+          recipe: result,
+        });
+      } catch (error) {
+        // DB 변경 중 오류가 발생한 경우 메모리 데이터 복구
+        if (originalRecipe && updatedRecipe) {
+          Object.keys(updatedRecipe).forEach(
+            (key) => delete updatedRecipe[key],
+          );
+
+          Object.assign(updatedRecipe, originalRecipe);
+        }
+
+        if (originalImages) {
+          const imageList = images().value();
+          imageList.splice(0, imageList.length, ...originalImages);
+        }
+
+        // 신규 업로드 파일 제거
+        if (savedFile) {
+          await fs.promises
+            .rm(savedFile, {
+              force: true,
+            })
+            .catch(() => {});
+        }
+
+        if (error instanceof ValidationError) {
+          return res.status(error.status).json({
+            message: error.message,
+          });
+        }
+
+        next(error);
+      }
+    },
+  );
+
   // 게시글 삭제
   // DELETE /api/recipes/:id
   router.delete("/recipes/:id", requireAuth, async (req, res, next) => {

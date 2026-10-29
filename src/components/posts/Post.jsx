@@ -62,7 +62,15 @@ function Post() {
     setLike(!isLike);
   };
 
-  const postFix = () => {};
+  const postFix = () => {
+    nav(`/post/edit/${post.id}`, {
+      state: {
+        initData: post,
+      },
+    });
+  };
+
+  //게시글 삭제기능
   const postDel = async () => {
     if (!post?.id) {
       alert("삭제할 게시글 정보가 없습니다.");

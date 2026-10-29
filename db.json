@@ -1879,6 +1879,34 @@
         "양념이 베었다면 드시면됩니다."
       ],
       "id": 51
+    },
+    {
+      "id": 53,
+      "title": "asdzxc",
+      "content": "zxczcxasdad112313",
+      "portion": "1",
+      "time": 124,
+      "all_ingredient": {
+        "ingredients": [
+          "gfdfg"
+        ],
+        "sauces": [
+          "12"
+        ]
+      },
+      "category": {
+        "method": "삶기",
+        "type": "차/음료/술"
+      },
+      "recipes": [
+        "5153",
+        "123123"
+      ],
+      "author": "asdf",
+      "likes": 0,
+      "img_url": null,
+      "create_at": "2026-10-29T06:05:26.435Z",
+      "update_at": "2026-10-29T07:22:37.039Z"
     }
   ],
   "members": [

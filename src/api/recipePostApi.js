@@ -51,8 +51,28 @@ export const createRecipePostWithImage = async (postData, imageFile) => {
 };
 
 //게시글 삭제
-
-export const DeletePost = async (params) => {
-  const response = await api.delete(`${endpoint}/${params}`);
+export const DeletePost = async (id) => {
+  const response = await api.delete(`${endpoint}/${id}`);
   return response;
+};
+
+//게시글 수정
+export const updateRecipePostWithImage = async (
+  id,
+  postData,
+  imageFile,
+  removeImage = false,
+) => {
+  const formData = new FormData();
+
+  formData.append("post", JSON.stringify(postData));
+  formData.append("removeImage", String(removeImage));
+
+  if (imageFile instanceof File) {
+    formData.append("image", imageFile);
+  }
+
+  const response = await api.patch(`${endpoint}/${id}`, formData);
+
+  return response.data;
 };
