@@ -1,54 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import "./PostCreate.css";
-import { createRecipePost } from "../../api/recipePostApi";
-
-// 조리 방식
-const METHOD_OPTIONS = [
-  "볶음",
-  "끓이기",
-  "부침",
-  "조림",
-  "무침",
-  "비빔",
-  "찜",
-  "절임",
-  "튀김",
-  "삶기",
-  "굽기",
-  "데치기",
-  "회",
-  "기타",
-];
-
-// 요리 종류
-const TYPE_OPTIONS = [
-  "밑반찬",
-  "메인반찬",
-  "국/탕",
-  "찌개",
-  "디저트",
-  "면/만두",
-  "밥/죽/떡",
-  "퓨젼",
-  "김치/젓갈/장류",
-  "양념/소스/잼",
-  "양식",
-  "샐러드",
-  "스프",
-  "빵",
-  "과자",
-  "차/음료/술",
-  "기타",
-];
+import {
+  createRecipePost,
+  createRecipePostWithImage,
+} from "../../api/recipePostApi";
+import { getSessionMember } from "../../api/session";
+import { METHOD_OPTIONS, TYPE_OPTIONS } from "./postUtil/categoryData.js";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
-const PostCreate = () => {
+const PostCreate = ({ initData }) => {
   const nav = useNavigate();
+  const { nickname } = getSessionMember();
 
   //수정되어야 하는것들///////
-  const nickname = "채재희";
   const img_url = null;
   /////////////////////////////////
 
@@ -75,6 +41,27 @@ const PostCreate = () => {
   // 카테고리
   const [method, setMethod] = useState("");
   const [type, setType] = useState("");
+
+  //초기값 세팅
+  const initValue = () => {
+    console.log(initData);
+    if (initData) {
+      setTitle(initData.title);
+      setContent(initData.content);
+      // setImage(initData.title);
+      setIngredients(initData.ingredients);
+      setSauces(initData.sauces);
+      setRecipes(initData.recipes);
+      setTime(initData.time);
+      setPortion(initData.portion);
+      setMethod(initData.method);
+      setType(initData.type);
+    }
+    console.log("초기값 세팅");
+  };
+  useEffect(() => {
+    initValue();
+  }, []);
 
   //생성 연속 클릭 방지
   const [isSubmitting, setIsSubmitting] = useState();
@@ -211,7 +198,6 @@ const PostCreate = () => {
       },
       recipes: validRecipes,
       likes: 0,
-      img_url: img_url, //이미지 url구조 완성되어야한다.
       create_at: new Date().toLocaleTimeString(),
       update_at: new Date().toLocaleTimeString(),
     };
@@ -225,7 +211,7 @@ const PostCreate = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await createRecipePost(recipeData);
+      const response = await createRecipePostWithImage(recipeData, image);
 
       console.log("게시글 생성 성공:", response);
       alert("레시피가 등록되었습니다.");
