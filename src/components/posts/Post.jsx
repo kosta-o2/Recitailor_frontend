@@ -82,7 +82,10 @@ function Post() {
               </div>
               <div className="content">{content}</div>
               <div className="info">
-                <Cooking_info title="조리 시간" info={time + "분"} />
+                <Cooking_info
+                  title="조리 시간"
+                  info={time ? time + "분" : ""}
+                />
                 <Cooking_info title="인원 수" info={portion} />
                 {category ? (
                   <>
