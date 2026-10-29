@@ -1,5 +1,5 @@
 import api from "./axios";
-import { createRecipePost } from "./recipePostApi";
+import { createRecipePostWithImage } from "./recipePostApi";
 import searchMock from "../mock/ai-search.json";
 import createMock from "../mock/ai-create.json";
 
@@ -50,7 +50,7 @@ export async function fetchCreate(query) {
 export function saveDraft(draft, mode) {
   const toText = ({ name, quantity }) => `${name} ${quantity}`.trim();
 
-  return createRecipePost({
+  return createRecipePostWithImage({
     title: draft.title,
     content: draft.description,
     portion: `${draft.portion}인분`,
