@@ -8,6 +8,7 @@ const { createRequireAuth } = require("../middleware/requireAuth.cjs");
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_POST_JSON_SIZE = 1024 * 1024;
 const UPLOAD_URL_PREFIX = "/uploads";
+const AI_POST_TYPES = ["ai_search", "ai_create"];
 
 const PROTECTED_COLLECTIONS = /^\/(recipes|recipe_post_images)(\/|$)/i;
 
@@ -119,8 +120,14 @@ function parsePost(input) {
     throw new ValidationError("조리 방식과 요리 종류를 선택해 주세요.");
   }
 
+  // 일반 작성은 normal, AI 결과를 저장할 때만 ai_search / ai_create. 그 외 값은 normal로 본다.
+  const postType = AI_POST_TYPES.includes(input.post_type)
+    ? input.post_type
+    : "normal";
+
   return {
     title: input.title.trim(),
+    post_type: postType,
     content: content.trim(),
     portion: portion.trim(),
     time,

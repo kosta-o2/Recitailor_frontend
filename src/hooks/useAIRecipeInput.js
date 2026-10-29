@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { focusRecipeInput } from "../utils/header";
+import { clearResults } from "../utils/aiResults";
 
 export function useAIRecipeInput() {
   const location = useLocation();
+  const navigate = useNavigate();
   const inputRef = useRef(null);
 
   const [mode, setMode] = useState("search");
@@ -43,11 +45,12 @@ export function useAIRecipeInput() {
       return;
     }
 
-    if (mode === "search") {
-      // 여기에 검색 함수를 연결하고 value 전달
-    } else {
-      // 여기에 생성 함수를 연결하고 value 전달
-    }
+    // 새 검색이므로 이전 결과를 지우고 결과 페이지로 보낸다.
+    // 로그인하지 않았으면 결과 페이지의 RequireAuth가 로그인으로 보내고, 로그인 후 같은 주소로 돌아온다.
+    clearResults();
+    navigate(
+      `/ai/${mode === "search" ? "search" : "create"}?q=${encodeURIComponent(value)}`,
+    );
   }
 
   return {
