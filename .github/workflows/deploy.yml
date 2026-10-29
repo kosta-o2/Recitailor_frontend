@@ -62,8 +62,9 @@ jobs:
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
           ssh -o BatchMode=yes \
-            "$EC2_USER@$EC2_HOST" \
-            'bash -se' <<'EOF'
+              -o StrictHostKeyChecking=yes \
+              "$EC2_USER@$EC2_HOST" \
+              'bash -se' <<'EOF'
           set -e
 
           cd /home/ubuntu/Recitailor_frontend
