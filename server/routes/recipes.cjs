@@ -451,9 +451,9 @@ function createRecipesRouter(db, { uploadDir }) {
         // 9. 게시글 수정
         Object.assign(recipe, {
           ...post,
+          ...(removeImage || newImageUrl ? { img_url: null } : {}),
           update_at: new Date().toISOString(),
         });
-
         updatedRecipe = recipe;
 
         // 10. 새 이미지가 있다면 기존 이미지 정보 교체
@@ -539,7 +539,93 @@ function createRecipesRouter(db, { uploadDir }) {
       }
     },
   );
+  // 게시글 검색 및 페이지네이션
+  // GET /api/recipes/search
+  router.get("/recipes/search", (req, res, next) => {
+    try {
+      const keyword = String(req.query.keyword ?? "")
+        .trim()
+        .toLowerCase();
 
+      const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+
+      const limit = Math.max(1, Number.parseInt(req.query.limit, 10) || 3);
+
+      const sortBy = req.query.sortBy;
+      const sortOrder = req.query.sortOrder;
+
+      // 1. 전체 게시글 조회
+      let posts = db.get("recipes").value();
+
+      // 2. 검색어 필터링
+      if (keyword) {
+        posts = posts.filter((post) => {
+          const ingredients = Array.isArray(post.all_ingredient?.ingredients)
+            ? post.all_ingredient.ingredients
+            : [];
+
+          const sauces = Array.isArray(post.all_ingredient?.sauces)
+            ? post.all_ingredient.sauces
+            : [];
+
+          const searchText = [
+            post.title ?? "",
+            post.content ?? "",
+            ...ingredients,
+            ...sauces,
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          return searchText.includes(keyword);
+        });
+      }
+
+      // 3. 정렬
+      if (
+        ["create_at", "likes"].includes(sortBy) &&
+        ["asc", "desc"].includes(sortOrder)
+      ) {
+        posts = [...posts].sort((a, b) => {
+          const aValue = a[sortBy];
+          const bValue = b[sortBy];
+
+          let result = 0;
+
+          if (sortBy === "likes") {
+            result = Number(aValue ?? 0) - Number(bValue ?? 0);
+          } else {
+            result = String(aValue ?? "").localeCompare(String(bValue ?? ""));
+          }
+
+          return sortOrder === "desc" ? -result : result;
+        });
+      }
+
+      // 4. 검색 결과 기준 페이지 수 계산
+      const total = posts.length;
+      const last = Math.ceil(total / limit);
+
+      // 5. 페이지네이션
+      const start = (page - 1) * limit;
+      const paginatedPosts = posts.slice(start, start + limit);
+
+      // 6. 이미지와 작성자 정보 결합
+      const buildView = createViewBuilder();
+
+      const data = paginatedPosts.map(buildView);
+
+      // 7. 결과 반환
+      return res.status(200).json({
+        data,
+        total,
+        page,
+        last,
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
   // 게시글 삭제
   // DELETE /api/recipes/:id
   router.delete("/recipes/:id", requireAuth, async (req, res, next) => {
