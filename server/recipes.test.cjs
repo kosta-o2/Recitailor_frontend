@@ -546,6 +546,22 @@ test("게시판 구분: kind 필터, 수정해도 post_type 유지", async (t) =
     assert.deepEqual(ids(body), [aiCreate.id]);
   });
 
+  await t.test("검색 API도 kind로 게시판을 나눈다", async () => {
+    const ai = (await get("recipes/search?kind=ai&limit=10")).body;
+    assert.equal(ai.total, 2);
+    assert.deepEqual(ids(ai.data), [aiSearch.id, aiCreate.id]);
+
+    const user = (await get("recipes/search?kind=user&limit=10")).body;
+    assert.equal(user.total, 3);
+    assert.deepEqual(ids(user.data), [1, 2, normal.id]);
+
+    const paged = (await get("recipes/search?kind=ai&limit=1")).body;
+    assert.equal(paged.last, 2);
+
+    assert.equal((await get("recipes/search?limit=10")).body.total, 5);
+    assert.equal((await get("recipes/search?kind=etc")).res.status, 400);
+  });
+
   await t.test("AI 글을 수정해도 post_type은 그대로", async () => {
     const res = await send("PATCH", `recipes/${aiSearch.id}`, { ...POST, title: "수정됨" });
     assert.equal(res.status, 200);
