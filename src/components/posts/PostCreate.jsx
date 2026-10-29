@@ -6,6 +6,7 @@ import {
   updateRecipePostWithImage,
 } from "../../api/recipePostApi";
 import { getSessionMember } from "../../api/session";
+import { boardPath } from "../../utils/boardPath";
 import { METHOD_OPTIONS, TYPE_OPTIONS } from "./postUtil/categoryData.js";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -212,7 +213,7 @@ const PostCreate = ({ initData = null }) => {
         alert("게시글이 생성되었습니다.");
       }
 
-      nav("/post");
+      nav(boardPath(initData?.post_type));
     } catch (error) {
       console.error("게시글 저장 실패:", error);
       alert("게시글 저장 중 오류가 발생했습니다.");

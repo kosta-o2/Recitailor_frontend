@@ -495,3 +495,112 @@ test("이전 컬럼명(recipes_id)의 favorites는 시작할 때 recipe_posts_id
     1,
   );
 });
+
+test("게시판 구분: kind 필터, 수정해도 post_type 유지", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recitailor-"));
+  const app = await start(seed(dir), path.join(dir, "images"));
+  t.after(async () => {
+    await app.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const token = await login(app.base, "alice");
+  const send = (method, url, body) =>
+    fetch(`${app.base}/api/${url}`, {
+      method,
+      headers: { ...auth(token), "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  const get = async (url) => {
+    const res = await fetch(`${app.base}/api/${url}`);
+    return { res, body: await res.json() };
+  };
+  const ids = (list) => list.map((r) => r.id).sort((a, b) => a - b);
+
+  const aiSearch = await (await send("POST", "recipes", { ...POST, post_type: "ai_search" })).json();
+  const aiCreate = await (await send("POST", "recipes", { ...POST, post_type: "ai_create" })).json();
+  const normal = await (await send("POST", "recipes", POST)).json();
+
+  await t.test("kind=user 는 일반 글(post_type 없는 기존 글 포함)만", async () => {
+    const { body } = await get("recipes?kind=user");
+    assert.deepEqual(ids(body), [1, 2, normal.id]);
+  });
+
+  await t.test("kind=ai 는 AI 글만", async () => {
+    const { body } = await get("recipes?kind=ai");
+    assert.deepEqual(ids(body), [aiSearch.id, aiCreate.id]);
+  });
+
+  await t.test("kind 없으면 전체, 잘못된 값은 400", async () => {
+    assert.equal((await get("recipes")).body.length, 5);
+    assert.equal((await get("recipes?kind=etc")).res.status, 400);
+  });
+
+  await t.test("kind와 페이지네이션/좋아요 정렬을 함께 쓴다", async () => {
+    await fetch(`${app.base}/api/mypage/favorites/${aiCreate.id}`, {
+      method: "PUT",
+      headers: auth(token),
+    });
+
+    const { res, body } = await get("recipes?kind=ai&_sort=likes&_order=desc&_page=1&_limit=1");
+    assert.equal(res.headers.get("x-total-count"), "2");
+    assert.deepEqual(ids(body), [aiCreate.id]);
+  });
+
+  await t.test("AI 글을 수정해도 post_type은 그대로", async () => {
+    const res = await send("PATCH", `recipes/${aiSearch.id}`, { ...POST, title: "수정됨" });
+    assert.equal(res.status, 200);
+
+    const { body } = await get(`recipes/${aiSearch.id}`);
+    assert.equal(body.title, "수정됨");
+    assert.equal(body.post_type, "ai_search");
+    assert.deepEqual(ids((await get("recipes?kind=ai")).body), [aiSearch.id, aiCreate.id]);
+  });
+});
+
+test("마이페이지 kind 필터: 내가 작성한 글, 좋아요한 글", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recitailor-"));
+  const app = await start(seed(dir), path.join(dir, "images"));
+  t.after(async () => {
+    await app.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const alice = await login(app.base, "alice");
+  const bob = await login(app.base, "bob");
+  const create = async (token, extra) =>
+    (
+      await fetch(`${app.base}/api/recipes`, {
+        method: "POST",
+        headers: { ...auth(token), "Content-Type": "application/json" },
+        body: JSON.stringify({ ...POST, ...extra }),
+      })
+    ).json();
+  const ids = async (url, token) => {
+    const res = await fetch(`${app.base}/api/mypage/${url}`, { headers: auth(token) });
+    const body = await res.json();
+    return { status: res.status, total: body.total, ids: body.items?.map((r) => r.id).sort((a, b) => a - b) };
+  };
+
+  const normal = await create(alice, {});
+  const ai = await create(alice, { post_type: "ai_create" });
+
+  for (const id of [normal.id, ai.id]) {
+    await fetch(`${app.base}/api/mypage/favorites/${id}`, { method: "PUT", headers: auth(bob) });
+  }
+
+  await t.test("내가 작성한 글: 전체/일반/AI", async () => {
+    assert.deepEqual((await ids("recipes", alice)).ids, [normal.id, ai.id]);
+    assert.deepEqual(await ids("recipes?kind=user", alice), { status: 200, total: 1, ids: [normal.id] });
+    assert.deepEqual(await ids("recipes?kind=ai", alice), { status: 200, total: 1, ids: [ai.id] });
+  });
+
+  await t.test("좋아요한 글: 전체/일반/AI", async () => {
+    assert.deepEqual((await ids("favorites", bob)).ids, [normal.id, ai.id]);
+    assert.deepEqual((await ids("favorites?kind=user", bob)).ids, [normal.id]);
+    assert.deepEqual((await ids("favorites?kind=ai", bob)).ids, [ai.id]);
+  });
+
+  await t.test("잘못된 kind는 400", async () => {
+    assert.equal((await ids("recipes?kind=etc", alice)).status, 400);
+    assert.equal((await ids("favorites?kind=etc", bob)).status, 400);
+  });
+});

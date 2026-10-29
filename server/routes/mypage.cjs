@@ -3,8 +3,10 @@ const bcrypt = require("bcryptjs");
 const { isValidPassword } = require("./auth.cjs");
 const { createRequireAuth } = require("../middleware/requireAuth.cjs");
 const { createFavoriteStore } = require("../lib/favorites.cjs");
+const { parseKind, filterByKind } = require("../lib/postTypes.cjs");
 
 const PER_PAGE = 10;
+const KIND_ERROR = { message: "kind는 user 또는 ai여야 합니다." };
 
 // 마이페이지 응답용 회원 정보 (비밀번호 제외)
 function myMember(member) {
@@ -177,13 +179,20 @@ function createMypageRouter(db) {
   });
 
   // 내가 작성한 레시피 목록 (최신순)
-  // GET /api/mypage/recipes?page=1
+  // GET /api/mypage/recipes?page=1&kind=user|ai (kind가 없으면 전체)
   router.get("/recipes", (req, res) => {
-    const mine = recipes()
-      .filter({ author: req.member.id })
-      .value()
-      .slice()
-      .sort((a, b) => String(b.create_at).localeCompare(String(a.create_at)));
+    const kind = parseKind(req.query.kind);
+
+    if (!kind) return res.status(400).json(KIND_ERROR);
+
+    const mine = filterByKind(
+      recipes()
+        .filter({ author: req.member.id })
+        .value()
+        .slice()
+        .sort((a, b) => String(b.create_at).localeCompare(String(a.create_at))),
+      kind,
+    );
 
     const result = paginate(mine, req.query.page);
 
@@ -194,8 +203,12 @@ function createMypageRouter(db) {
   });
 
   // 좋아요한 레시피 목록 (최근에 누른 순)
-  // GET /api/mypage/favorites?page=1
+  // GET /api/mypage/favorites?page=1&kind=user|ai (kind가 없으면 전체)
   router.get("/favorites", (req, res) => {
+    const kind = parseKind(req.query.kind);
+
+    if (!kind) return res.status(400).json(KIND_ERROR);
+
     const mine = favorites.listByMember(req.member.id);
 
     // 삭제된 레시피는 목록에서 제외한다.
@@ -209,7 +222,7 @@ function createMypageRouter(db) {
       )
       .filter(Boolean);
 
-    const result = paginate(liked, req.query.page);
+    const result = paginate(filterByKind(liked, kind), req.query.page);
 
     return res.status(200).json({
       ...result,

@@ -9,6 +9,7 @@ import Image from "./postUtil/Image";
 import { useNavigate, useParams } from "react-router";
 import { DeletePost, getPostbyId } from "../../api/recipePostApi";
 import { getSessionMember } from "../../api/session";
+import { boardPath } from "../../utils/boardPath";
 import { addFavorite, removeFavorite } from "../../api/mypageApi";
 
 function Post() {
@@ -104,7 +105,7 @@ function Post() {
       const re = await DeletePost(post.id);
       console.log(re);
       alert("게시글이 삭제되었습니다.");
-      nav("/post");
+      nav(boardPath(post.post_type));
     } catch (error) {
       console.error("게시글 삭제 실패:", error);
       alert("게시글 삭제 중 오류가 발생했습니다.");

@@ -8,11 +8,11 @@ const {
   createOptionalAuth,
 } = require("../middleware/requireAuth.cjs");
 const { createFavoriteStore } = require("../lib/favorites.cjs");
+const { AI_POST_TYPES } = require("../lib/postTypes.cjs");
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_POST_JSON_SIZE = 1024 * 1024;
 const UPLOAD_URL_PREFIX = "/uploads";
-const AI_POST_TYPES = ["ai_search", "ai_create"];
 
 const PROTECTED_COLLECTIONS = /^\/(recipes|recipe_post_images)(\/|$)/i;
 
@@ -466,8 +466,10 @@ function createRecipesRouter(db, { uploadDir }) {
         );
 
         // 9. 게시글 수정
+        // post_type은 수정할 수 없다. (AI 글이 일반 글로 바뀌지 않게 기존 값을 유지)
         Object.assign(recipe, {
           ...post,
+          post_type: recipe.post_type || "normal",
           update_at: new Date().toISOString(),
         });
 
@@ -633,11 +635,30 @@ function createRecipesRouter(db, { uploadDir }) {
       /^\/recipes(\/|$)/i.test(req.path) &&
       ["GET", "HEAD"].includes(req.method)
     ) {
-      // JSON Server가 정렬(_sort=likes)할 수 있게 저장된 likes 대신 favorites 집계값을 메모리에 맞춰 둔다.
+      // JSON Server가 정렬(_sort=likes)·필터(post_type)할 수 있게 메모리 값을 맞춰 둔다.
+      // likes는 favorites 집계값, post_type이 없는 기존 글은 normal로 본다.
       const likeCounts = favorites.countsByPost();
 
       for (const recipe of db.get("recipes").value()) {
         recipe.likes = likeCounts.get(String(recipe.id)) ?? 0;
+        recipe.post_type = recipe.post_type || "normal";
+      }
+
+      // 목록 구분: ?kind=user 는 일반 글, ?kind=ai 는 AI 글만 (없으면 전체)
+      if (req.query.kind !== undefined && /^\/recipes\/?$/i.test(req.path)) {
+        const kind = req.query.kind;
+
+        delete req.query.kind;
+
+        if (kind === "user") {
+          req.query.post_type = "normal";
+        } else if (kind === "ai") {
+          req.query.post_type = AI_POST_TYPES;
+        } else {
+          return res.status(400).json({
+            message: "kind는 user 또는 ai여야 합니다.",
+          });
+        }
       }
 
       optionalAuth(req, res, () => {});
