@@ -13,7 +13,10 @@ const PROTECTED_COLLECTIONS = /^\/(recipes|recipe_post_images)(\/|$)/i;
 
 // 파일 앞부분(시그니처)으로 실제 형식을 판별한다. 클라이언트 MIME/확장자는 믿지 않는다.
 function detectImageExtension(buffer) {
-  if (buffer.length >= 3 && buffer.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))) {
+  if (
+    buffer.length >= 3 &&
+    buffer.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))
+  ) {
     return ".jpg";
   }
 
@@ -267,7 +270,9 @@ function createRecipesRouter(db, { uploadDir }) {
           extension = detectImageExtension(req.file.buffer);
 
           if (!extension) {
-            throw new ValidationError("JPG 또는 PNG 이미지만 업로드할 수 있습니다.");
+            throw new ValidationError(
+              "JPG 또는 PNG 이미지만 업로드할 수 있습니다.",
+            );
           }
         }
 
@@ -345,6 +350,62 @@ function createRecipesRouter(db, { uploadDir }) {
       }
     },
   );
+
+  // 게시글 삭제
+  // DELETE /api/recipes/:id
+  router.delete("/recipes/:id", requireAuth, async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+
+      if (!Number.isSafeInteger(id) || id <= 0) {
+        return res.status(400).json({
+          message: "올바르지 않은 게시글 ID입니다.",
+        });
+      }
+
+      const recipe = db.get("recipes").find({ id }).value();
+
+      if (!recipe) {
+        return res.status(404).json({
+          message: "게시글을 찾을 수 없습니다.",
+        });
+      }
+
+      // 본인이 작성한 게시글인지 확인
+      if (String(recipe.author) !== String(req.member.id)) {
+        return res.status(403).json({
+          message: "본인이 작성한 게시글만 삭제할 수 있습니다.",
+        });
+      }
+
+      // 게시글에 연결된 이미지 정보 조회
+      const linkedImages = db
+        .get("recipe_post_images")
+        .filter({ recipe_posts_id: id })
+        .value();
+
+      // 게시글 및 이미지 데이터 삭제
+      db.get("recipes").remove({ id }).write();
+
+      db.get("recipe_post_images").remove({ recipe_posts_id: id }).write();
+
+      // 저장된 이미지 파일 삭제
+      for (const image of linkedImages) {
+        if (!image.img_url?.startsWith(`${UPLOAD_URL_PREFIX}/`)) continue;
+
+        const filename = path.basename(image.img_url);
+        const filePath = path.join(uploadDir, filename);
+
+        await fs.promises.rm(filePath, { force: true });
+      }
+
+      return res.status(200).json({
+        message: "게시글이 삭제되었습니다.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // 게시글/이미지 데이터의 나머지 쓰기는 모두 차단한다.
   // (검증·소유권 검사를 우회하는 기본 CRUD, X-HTTP-Method-Override 포함)

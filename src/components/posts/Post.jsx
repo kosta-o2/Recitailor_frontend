@@ -6,8 +6,9 @@ import Recipe from "./Recipe";
 import like from "../../assets/images/like.svg";
 import empty_heart from "../../assets/images/empty_heart.svg";
 import Image from "./postUtil/Image";
-import { useParams } from "react-router";
-import { getPostbyId } from "../../api/recipePostApi";
+import { useNavigate, useParams } from "react-router";
+import { DeletePost, getPostbyId } from "../../api/recipePostApi";
+import { getSessionMember } from "../../api/session";
 
 function Post() {
   const paramsId = useParams().id;
@@ -15,6 +16,8 @@ function Post() {
   const [recipeVisible, setRecipeVisible] = useState(false);
   const [post, setPost] = useState([]);
   const [isLike, setLike] = useState(false);
+  const nav = useNavigate();
+  const { id: userId, nickName } = getSessionMember();
 
   useEffect(() => {
     const getDetail = async (params) => {
@@ -58,11 +61,41 @@ function Post() {
     //TODO 좋아요 기능 구현
     setLike(!isLike);
   };
+
+  const postFix = () => {};
+  const postDel = async () => {
+    if (!post?.id) {
+      alert("삭제할 게시글 정보가 없습니다.");
+      return;
+    }
+
+    const isConfirmed = window.confirm("정말 게시글을 삭제하시겠습니까?");
+
+    if (!isConfirmed) return;
+
+    try {
+      const re = await DeletePost(post.id);
+      console.log(re);
+      alert("게시글이 삭제되었습니다.");
+      nav("/post");
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제 중 오류가 발생했습니다.");
+    }
+  };
   return (
     <>
       {post ? (
         <div className="posts">
-          <div>게시글생성</div>
+          <div className="postCreate">
+            <div className="PostCreateTitle">게시글생성</div>
+            <button className="postsFix" onClick={postFix}>
+              수정
+            </button>
+            <button className="postDel" onClick={postDel}>
+              삭제
+            </button>
+          </div>
           <div className="header">
             <div>
               <Image src={img_url} alt="대표이미지" />

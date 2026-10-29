@@ -1879,34 +1879,6 @@
         "양념이 베었다면 드시면됩니다."
       ],
       "id": 51
-    },
-    {
-      "id": 52,
-      "title": "마라탕",
-      "content": "마라라라라라",
-      "portion": "",
-      "time": null,
-      "all_ingredient": {
-        "ingredients": [
-          "고기",
-          "마라"
-        ],
-        "sauces": [
-          "마라"
-        ]
-      },
-      "category": {
-        "method": "볶음",
-        "type": "기타"
-      },
-      "recipes": [
-        "마라"
-      ],
-      "author": "asdf",
-      "likes": 0,
-      "img_url": null,
-      "create_at": "2026-10-29T02:59:26.105Z",
-      "update_at": "2026-10-29T02:59:26.105Z"
     }
   ],
   "members": [
@@ -1982,11 +1954,5 @@
     }
   ],
   "favorites": [],
-  "recipe_post_images": [
-    {
-      "id": 1,
-      "img_url": "/uploads/b48d088a-981d-46eb-a1a6-e387c5b9e050.jpg",
-      "recipe_posts_id": 52
-    }
-  ]
+  "recipe_post_images": []
 }

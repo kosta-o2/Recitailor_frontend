@@ -34,10 +34,6 @@ export async function getPostbyId(id) {
 
   return data;
 }
-export const createRecipePost = async (postData) => {
-  const response = await api.post(endpoint, postData);
-  return response.data;
-};
 
 // 이미지를 함께 등록한다. 게시글은 JSON 문자열(post), 파일은 image로 한 요청에 보낸다.
 // 작성자는 서버가 로그인 토큰으로 정하므로 보내지 않아도 된다.
@@ -52,4 +48,11 @@ export const createRecipePostWithImage = async (postData, imageFile) => {
 
   const response = await api.post(endpoint, formData);
   return response.data;
+};
+
+//게시글 삭제
+
+export const DeletePost = async (params) => {
+  const response = await api.delete(`${endpoint}/${params}`);
+  return response;
 };

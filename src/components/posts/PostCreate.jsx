@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import "./PostCreate.css";
-import {
-  createRecipePost,
-  createRecipePostWithImage,
-} from "../../api/recipePostApi";
+import { createRecipePostWithImage } from "../../api/recipePostApi";
 import { getSessionMember } from "../../api/session";
 import { METHOD_OPTIONS, TYPE_OPTIONS } from "./postUtil/categoryData.js";
 
