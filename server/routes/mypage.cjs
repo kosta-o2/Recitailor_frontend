@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const { isValidPassword } = require("./auth.cjs");
 const { createRequireAuth } = require("../middleware/requireAuth.cjs");
+const { createFavoriteStore } = require("../lib/favorites.cjs");
 
 const PER_PAGE = 10;
 
@@ -46,19 +47,7 @@ function createMypageRouter(db) {
     return db.get("recipes");
   }
 
-  function favorites() {
-    if (!Array.isArray(db.get("favorites").value())) {
-      db.set("favorites", []).write();
-    }
-    return db.get("favorites");
-  }
-
-  function likeCount(recipeId) {
-    return favorites()
-      .filter((favorite) => String(favorite.recipes_id) === String(recipeId))
-      .size()
-      .value();
-  }
+  const favorites = createFavoriteStore(db);
 
   function toCard(recipe) {
     return {
@@ -66,7 +55,7 @@ function createMypageRouter(db) {
       title: recipe.title,
       post_type: recipe.post_type ?? "normal",
       create_at: recipe.create_at,
-      likes: likeCount(recipe.id),
+      likes: favorites.count(recipe.id),
     };
   }
 
@@ -81,7 +70,7 @@ function createMypageRouter(db) {
     return res.status(200).json({
       member: myMember(req.member),
       postCount: recipes().filter({ author: id }).size().value(),
-      favoriteCount: favorites().filter({ members_id: id }).size().value(),
+      favoriteCount: favorites.countByMember(id),
     });
   });
 
@@ -182,7 +171,7 @@ function createMypageRouter(db) {
       });
     db.write();
 
-    favorites().remove({ members_id: id }).write();
+    favorites.removeByMember(id);
 
     return res.status(200).json({ message: "회원탈퇴가 완료되었습니다." });
   });
@@ -207,17 +196,15 @@ function createMypageRouter(db) {
   // 좋아요한 레시피 목록 (최근에 누른 순)
   // GET /api/mypage/favorites?page=1
   router.get("/favorites", (req, res) => {
-    const mine = favorites()
-      .filter({ members_id: req.member.id })
-      .value()
-      .slice()
-      .sort((a, b) => b.id - a.id);
+    const mine = favorites.listByMember(req.member.id);
 
     // 삭제된 레시피는 목록에서 제외한다.
     const liked = mine
       .map((favorite) =>
         recipes()
-          .find((recipe) => String(recipe.id) === String(favorite.recipes_id))
+          .find(
+            (recipe) => String(recipe.id) === String(favorite.recipe_posts_id),
+          )
           .value(),
       )
       .filter(Boolean);
@@ -243,33 +230,12 @@ function createMypageRouter(db) {
       return res.status(404).json({ message: "존재하지 않는 레시피입니다." });
     }
 
-    const exists = favorites()
-      .find(
-        (favorite) =>
-          favorite.members_id === req.member.id &&
-          String(favorite.recipes_id) === recipeId,
-      )
-      .value();
+    const created = favorites.add(req.member.id, recipe.id);
 
-    if (!exists) {
-      const nextId =
-        favorites()
-          .map("id")
-          .value()
-          .reduce((max, value) => Math.max(max, value), 0) + 1;
-
-      favorites()
-        .push({
-          id: nextId,
-          members_id: req.member.id,
-          recipes_id: recipe.id,
-        })
-        .write();
-    }
-
-    return res.status(exists ? 200 : 201).json({
+    return res.status(created ? 201 : 200).json({
       message: "좋아요를 눌렀습니다.",
-      likes: likeCount(recipe.id),
+      liked: true,
+      likes: favorites.count(recipe.id),
     });
   });
 
@@ -278,17 +244,12 @@ function createMypageRouter(db) {
   router.delete("/favorites/:recipeId", (req, res) => {
     const { recipeId } = req.params;
 
-    favorites()
-      .remove(
-        (favorite) =>
-          favorite.members_id === req.member.id &&
-          String(favorite.recipes_id) === recipeId,
-      )
-      .write();
+    favorites.remove(req.member.id, recipeId);
 
     return res.status(200).json({
       message: "좋아요를 취소했습니다.",
-      likes: likeCount(recipeId),
+      liked: false,
+      likes: favorites.count(recipeId),
     });
   });
 
