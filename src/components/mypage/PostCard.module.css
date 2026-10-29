@@ -52,6 +52,21 @@
   font-weight: 700;
 }
 
+.badge_ai_search {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.badge_ai_create {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.badge_normal {
+  background: var(--bg-badge);
+  color: var(--text-label);
+}
+
 .title {
   overflow: hidden;
   font-size: 16px;

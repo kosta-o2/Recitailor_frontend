@@ -4,8 +4,17 @@ import styles from "./PostCard.module.css";
 
 const heartPath = "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z";
 
+const BADGES = {
+  ai_search: { label: "AI 찾기", className: styles.badge_ai_search },
+  ai_create: { label: "AI 생성", className: styles.badge_ai_create },
+  normal: { label: "일반", className: styles.badge_normal },
+};
+
 // 게시글 카드. onToggleLike를 넘기면 오른쪽 위에 하트 버튼이 붙는다 (liked: 채워진 하트).
 function PostCard({ recipe, liked = false, onToggleLike }) {
+  // post_type이 없는 기존 게시글은 사용자가 직접 쓴 글(normal)로 본다.
+  const badge = BADGES[recipe.post_type] ?? BADGES.normal;
+
   return (
     <div className={styles.wrapper}>
       <Link to={`/post/${recipe.id}`} className={styles.card}>
@@ -26,7 +35,9 @@ function PostCard({ recipe, liked = false, onToggleLike }) {
           </svg>
         </div>
         <div className={styles.body}>
-          <span className={styles.badge}>일반 레시피</span>
+          <span className={`${styles.badge} ${badge.className}`}>
+            {badge.label}
+          </span>
           <span className={styles.title}>{recipe.title}</span>
           <span className={styles.meta}>
             {formatDate(recipe.create_at)}

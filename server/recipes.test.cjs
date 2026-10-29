@@ -312,3 +312,42 @@ test("게시글 이미지 업로드/조회", async (t) => {
     assert.equal(app.db.get("recipe_post_images").size().value(), images);
   });
 });
+
+test("AI 레시피 post_type 저장/노출", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recitailor-"));
+  const app = await start(seed(dir), path.join(dir, "images"));
+  t.after(async () => {
+    await app.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const token = await login(app.base, "alice");
+  const create = async (extra) => {
+    const res = await fetch(`${app.base}/api/recipes`, {
+      method: "POST",
+      headers: { ...auth(token), "Content-Type": "application/json" },
+      body: JSON.stringify({ ...POST, ...extra }),
+    });
+    return { res, body: await res.json() };
+  };
+
+  await t.test("ai_create / ai_search 는 그대로 저장", async () => {
+    const created = await create({ post_type: "ai_create" });
+    assert.equal(created.res.status, 201);
+    assert.equal(created.body.post_type, "ai_create");
+    assert.equal((await create({ post_type: "ai_search" })).body.post_type, "ai_search");
+  });
+
+  await t.test("미지정/알 수 없는 값은 normal", async () => {
+    assert.equal((await create({})).body.post_type, "normal");
+    assert.equal((await create({ post_type: "admin" })).body.post_type, "normal");
+  });
+
+  await t.test("마이페이지 목록에 post_type 노출 (없으면 normal)", async () => {
+    const res = await fetch(`${app.base}/api/mypage/recipes`, {
+      headers: auth(token),
+    });
+    const { items } = await res.json();
+    const types = items.map((item) => item.post_type).sort();
+    assert.deepEqual(types, ["ai_create", "ai_search", "normal", "normal"]);
+  });
+});
