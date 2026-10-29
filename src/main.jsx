@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router";
 import NotFound from "./pages/NotFound.jsx";
 import Post from "./components/posts/Post.jsx";
 import MainPage from "./pages/MainPage.jsx";
@@ -24,6 +24,9 @@ import MyPostsPage from "./pages/MyPostsPage.jsx";
 import MyLikesPage from "./pages/MyLikesPage.jsx";
 import WithdrawPage from "./pages/WithdrawPage.jsx";
 import WithdrawCompletePage from "./pages/WithdrawCompletePage.jsx";
+import AiSearchResultsPage from "./pages/AiSearchResultsPage.jsx";
+import AiCreateResultsPage from "./pages/AiCreateResultsPage.jsx";
+import AiRecipeDetailPage from "./pages/AiRecipeDetailPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +46,19 @@ const router = createBrowserRouter([
           { index: true, element: <PostList /> },
           { path: ":id", element: <Post /> },
           { path: "create", element: <PostCreate /> },
+        ],
+      },
+      {
+        path: "ai",
+        element: (
+          <RequireAuth>
+            <Outlet />
+          </RequireAuth>
+        ),
+        children: [
+          { path: "search", element: <AiSearchResultsPage /> },
+          { path: "create", element: <AiCreateResultsPage /> },
+          { path: "recipes/:tempId", element: <AiRecipeDetailPage /> },
         ],
       },
       {
