@@ -8,7 +8,11 @@ const {
   createOptionalAuth,
 } = require("../middleware/requireAuth.cjs");
 const { createFavoriteStore } = require("../lib/favorites.cjs");
-const { AI_POST_TYPES } = require("../lib/postTypes.cjs");
+const {
+  AI_POST_TYPES,
+  parseKind,
+  filterByKind,
+} = require("../lib/postTypes.cjs");
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_POST_JSON_SIZE = 1024 * 1024;
@@ -575,6 +579,17 @@ function createRecipesRouter(db, { uploadDir }) {
 
       // 1. 전체 게시글 조회
       let posts = db.get("recipes").value();
+
+      // 게시판 구분: ?kind=user 는 일반 글, ?kind=ai 는 AI 글만 (없으면 전체)
+      const kind = parseKind(req.query.kind);
+
+      if (kind === null) {
+        return res.status(400).json({
+          message: "kind는 user 또는 ai여야 합니다.",
+        });
+      }
+
+      posts = filterByKind(posts, kind);
 
       // 2. 검색어 필터링
       if (keyword) {
