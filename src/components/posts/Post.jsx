@@ -6,8 +6,11 @@ import Recipe from "./Recipe";
 import like from "../../assets/images/like.svg";
 import empty_heart from "../../assets/images/empty_heart.svg";
 import Image from "./postUtil/Image";
-import { useParams } from "react-router";
-import { getPostbyId } from "../../api/recipePostApi";
+import { useNavigate, useParams } from "react-router";
+import { DeletePost, getPostbyId } from "../../api/recipePostApi";
+import { getSessionMember } from "../../api/session";
+import { boardPath } from "../../utils/boardPath";
+import { addFavorite, removeFavorite } from "../../api/mypageApi";
 
 function Post() {
   const paramsId = useParams().id;
@@ -15,12 +18,18 @@ function Post() {
   const [recipeVisible, setRecipeVisible] = useState(false);
   const [post, setPost] = useState([]);
   const [isLike, setLike] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [likeSaving, setLikeSaving] = useState(false);
+  const nav = useNavigate();
+  const { id: userId, nickname } = getSessionMember();
 
   useEffect(() => {
     const getDetail = async (params) => {
       const res = await getPostbyId(params);
       // console.log(res);
       setPost(res);
+      setLike(Boolean(res.liked));
+      setLikes(res.likes ?? 0);
     };
     getDetail(paramsId);
   }, [paramsId]);
@@ -43,26 +52,84 @@ function Post() {
   };
   const ToggleLikeView = () => {
     return (
-      <img
-        src={isLike ? like : empty_heart}
-        alt="좋아요 토글"
-        className="toggleLike"
-        onClick={() => {
-          toggleLike();
-          console.log(isLike);
-        }}
-      />
+      <div className="likeBox">
+        <img
+          src={isLike ? like : empty_heart}
+          alt="좋아요 토글"
+          className="toggleLike"
+          onClick={toggleLike}
+        />
+        <span className="likeCount">{likes}</span>
+      </div>
     );
   };
-  const toggleLike = () => {
-    //TODO 좋아요 기능 구현
-    setLike(!isLike);
+  // 좋아요 추가/해제. 서버가 돌려준 집계 값으로 하트와 개수를 맞춘다.
+  const toggleLike = async () => {
+    if (likeSaving || !id) return;
+
+    setLikeSaving(true);
+
+    try {
+      const data = isLike ? await removeFavorite(id) : await addFavorite(id);
+
+      setLike(data.liked);
+      setLikes(data.likes);
+    } catch (error) {
+      console.error("좋아요 변경 실패:", error);
+      alert("좋아요를 바꾸지 못했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setLikeSaving(false);
+    }
+  };
+
+  const postFix = () => {
+    nav(`/post/edit/${post.id}`, {
+      state: {
+        initData: post,
+      },
+    });
+  };
+
+  //게시글 삭제기능
+  const postDel = async () => {
+    if (!post?.id) {
+      alert("삭제할 게시글 정보가 없습니다.");
+      return;
+    }
+
+    const isConfirmed = window.confirm("정말 게시글을 삭제하시겠습니까?");
+
+    if (!isConfirmed) return;
+
+    try {
+      const re = await DeletePost(post.id);
+      console.log(re);
+      alert("게시글이 삭제되었습니다.");
+      nav(boardPath(post.post_type));
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제 중 오류가 발생했습니다.");
+    }
   };
   return (
     <>
       {post ? (
         <div className="posts">
-          <div>게시글생성</div>
+          <div className="postCreate">
+            <div className="PostCreateTitle">게시글생성</div>
+            {author === nickname ? (
+              <>
+                <button className="postsFix" onClick={postFix}>
+                  수정
+                </button>
+                <button className="postDel" onClick={postDel}>
+                  삭제
+                </button>
+              </>
+            ) : (
+              ""
+            )}
+          </div>
           <div className="header">
             <div>
               <Image src={img_url} alt="대표이미지" />
@@ -82,7 +149,10 @@ function Post() {
               </div>
               <div className="content">{content}</div>
               <div className="info">
-                <Cooking_info title="조리 시간" info={time + "분"} />
+                <Cooking_info
+                  title="조리 시간"
+                  info={time ? time + "분" : ""}
+                />
                 <Cooking_info title="인원 수" info={portion} />
                 {category ? (
                   <>

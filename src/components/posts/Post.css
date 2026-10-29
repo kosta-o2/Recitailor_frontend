@@ -17,6 +17,62 @@
   font-size: 13px;
 }
 
+/* 게시글 관리 영역 */
+.postCreate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* 게시글 생성 텍스트 */
+.PostCreateTitle {
+  margin-right: auto;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+/* 수정 / 삭제 공통 스타일 */
+.postsFix,
+.postDel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* 수정 버튼 */
+.postsFix {
+  background-color: #e8f2ff;
+  color: #3478c0;
+}
+
+.postsFix:hover {
+  background-color: #d7e9ff;
+  border-color: #a8cfff;
+}
+
+/* 삭제 버튼 */
+.postDel {
+  background-color: #fff0f0;
+  color: #d65a5a;
+}
+
+.postDel:hover {
+  background-color: #ffe0e0;
+  border-color: #f2b1b1;
+}
+
 /* The current JSX renders '게시글생성' in this slot, not the breadcrumb in the reference. */
 .posts > div:first-child:not(.header) {
   margin: 0 0 17px;
@@ -62,6 +118,16 @@
   letter-spacing: -0.045em;
   color: #263936;
   overflow-wrap: anywhere;
+}
+.posts .likeBox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.posts .likeCount {
+  color: var(--post-muted);
+  font-size: 14px;
 }
 .posts .toggleLike {
   width: 22px;

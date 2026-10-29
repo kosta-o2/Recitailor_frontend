@@ -5,12 +5,28 @@ import ViewList from "./ViewList";
 import Image from "./postUtil/Image";
 import { getPostbyPage } from "../../api/recipePostApi";
 import { useDispatch, useSelector } from "react-redux";
-import { setPage, setSort } from "../../features/postSlice";
+import { setKind, setPage, setSort } from "../../features/postSlice";
 import { useNavigate } from "react-router";
 
-function PostList() {
+const BOARDS = {
+  user: {
+    title: "레시피게시판",
+    description: "다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.",
+    canWrite: true,
+  },
+  ai: {
+    title: "AI 레시피 게시판",
+    description: "AI가 만든 레시피를 둘러보고 마음에 드는 레시피에 좋아요를 눌러보세요.",
+    canWrite: false,
+  },
+};
+
+// kind: "user"(일반 레시피 게시판) | "ai"(AI 레시피 게시판)
+function PostList({ kind = "user" }) {
+  const board = BOARDS[kind] ?? BOARDS.user;
   const nav = useNavigate();
   const [inputBox, setInputBox] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
   const inputRef = useRef();
   const [response, setResponse] = useState();
   const sortList = [
@@ -24,10 +40,40 @@ function PostList() {
   const pageGroup = Math.ceil(lastPage / PAGE_GROUP_SIZE); //페이지 그룹의 수
 
   const dispatch = useDispatch();
-  const { sortBy, sortOrder, page, limit } = useSelector(
-    (state) => state.posts,
-  );
+  const {
+    sortBy,
+    sortOrder,
+    page,
+    limit,
+    kind: listKind,
+  } = useSelector((state) => state.posts);
+
   useEffect(() => {
+    dispatch(setKind(kind));
+  }, [dispatch, kind]);
+
+ 
+  const handleSearchChange = (value) => {
+    setInputBox(value);
+
+    // 검색어 변경 시 첫 페이지로 이동
+    dispatch(setPage(1));
+    setCurrentPageGroup(1);
+  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchKeyword(inputBox.trim());
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [inputBox]);
+  
+  useEffect(() => {
+    let ignore = false;
+    
+    // 게시판이 바뀐 직후에는 이전 게시판의 페이지/정렬이므로 setKind 반영 뒤에 조회한다.
+    if (listKind !== kind) return;
+
     const fetchPosts = async () => {
       try {
         const data = await getPostbyPage({
@@ -35,16 +81,26 @@ function PostList() {
           limit,
           sortBy,
           sortOrder,
+          kind,
+          keyword: searchKeyword,
         });
 
-        setResponse(data);
+        if (!ignore) {
+          setResponse(data);
+        }
       } catch (error) {
-        console.error("게시글 조회 실패:", error);
+        if (!ignore) {
+          console.error("게시글 조회 실패:", error);
+        }
       }
     };
 
     fetchPosts();
-  }, [page, limit, sortBy, sortOrder]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [page, limit, sortBy, sortOrder, kind, listKind, searchKeyword]);
 
   const sortEvent = (sort) => {
     dispatch(
@@ -113,7 +169,7 @@ function PostList() {
           );
         },
         "〉",
-        currentPageGroup >= 4,
+        currentPageGroup >= pageGroup,
       ),
     );
     re.push(
@@ -123,7 +179,7 @@ function PostList() {
           setCurrentPageGroup(pageGroup);
         },
         "〉〉",
-        currentPageGroup >= 4,
+        currentPageGroup >= pageGroup,
       ),
     );
     return re;
@@ -133,29 +189,29 @@ function PostList() {
     <div className="postList">
       <div className="postHeader">
         <div className="postHeaderText">
-          <p className="postTitle">레시피게시판</p>
-          <p className="postDescription">
-            다른 사람의 레시피를 둘러보고 오늘의 메뉴를 찾아보세요.
-          </p>
+          <p className="postTitle">{board.title}</p>
+          <p className="postDescription">{board.description}</p>
         </div>
-        <button
-          type="button"
-          className="postCreateButton"
-          onClick={() => {
-            nav("/post/create");
-          }}
-        >
-          + 게시글 작성
-        </button>
+        {board.canWrite && (
+          <button
+            type="button"
+            className="postCreateButton"
+            onClick={() => {
+              nav("/post/create");
+            }}
+          >
+            + 게시글 작성
+          </button>
+        )}
       </div>
       <div className="searchBox">
         <div className="searchLine">
           <Image src={search} alt="검색" />
           <input
             type="text"
-            placeholder="레시피명, 재료, 작성자로 검색  "
+            placeholder="레시피명, 재료/양념, 소개글로 검색"
             onChange={(e) => {
-              setInputBox(e.target.value);
+              handleSearchChange(e.target.value);
             }}
             value={inputBox}
             ref={inputRef}
@@ -163,8 +219,8 @@ function PostList() {
         </div>
         <p
           onClick={() => {
-            setInputBox("");
-            inputRef.current.focus();
+            handleSearchChange("");
+            inputRef.current?.focus();
           }}
         >
           X
@@ -187,8 +243,18 @@ function PostList() {
           );
         })}
       </div>
-      <ViewList data={response?.data} />
-      <div className="postPagination">{ViewNumber()}</div>
+      {response?.data?.length > 0 ? (
+        <>
+          <ViewList data={response.data} />
+          <div className="postPagination">{ViewNumber()}</div>
+        </>
+      ) : (
+        <p className="postEmpty">
+          {searchKeyword
+            ? "검색 결과가 없습니다."
+            : "등록된 게시글이 없습니다."}
+        </p>
+      )}
     </div>
   );
 }

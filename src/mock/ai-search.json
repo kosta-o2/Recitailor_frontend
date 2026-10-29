@@ -1,0 +1,81 @@
+{
+  "api": [
+    {
+      "tempId": "api-1",
+      "source": "api",
+      "title": "두부조림",
+      "description": "짭조름한 양념이 속까지 배어든 기본 반찬",
+      "time": 20,
+      "portion": 2,
+      "type": "밑반찬",
+      "method": "조림",
+      "ingredients": [
+        { "type": 0, "name": "두부", "quantity": "1모" },
+        { "type": 0, "name": "대파", "quantity": "1/2대" },
+        { "type": 0, "name": "청양고추", "quantity": "1개" },
+        { "type": 1, "name": "간장", "quantity": "3큰술" },
+        { "type": 1, "name": "고춧가루", "quantity": "1큰술" },
+        { "type": 1, "name": "설탕", "quantity": "1/2큰술" },
+        { "type": 1, "name": "다진 마늘", "quantity": "1작은술" },
+        { "type": 1, "name": "물", "quantity": "1/2컵" }
+      ],
+      "steps": [
+        "두부는 1cm 두께로 썰어 키친타월로 물기를 빼주세요.",
+        "대파와 청양고추는 송송 썰어주세요.",
+        "간장, 고춧가루, 설탕, 다진 마늘, 물을 섞어 양념장을 만들어주세요.",
+        "팬에 기름을 두르고 두부를 앞뒤로 노릇하게 구워주세요.",
+        "양념장과 파, 고추를 넣고 중약불에서 양념이 자작해질 때까지 졸여주세요."
+      ]
+    },
+    {
+      "tempId": "api-2",
+      "source": "api",
+      "title": "두부 달걀국",
+      "description": "부드럽고 담백해서 아침에도 부담 없는 국",
+      "time": 15,
+      "portion": 2,
+      "type": "국/탕",
+      "method": "끓이기",
+      "ingredients": [
+        { "type": 0, "name": "두부", "quantity": "1/2모" },
+        { "type": 0, "name": "달걀", "quantity": "2개" },
+        { "type": 0, "name": "대파", "quantity": "1/3대" },
+        { "type": 0, "name": "멸치 육수", "quantity": "3컵" },
+        { "type": 1, "name": "국간장", "quantity": "1큰술" },
+        { "type": 1, "name": "소금", "quantity": "약간" }
+      ],
+      "steps": [
+        "두부는 깍둑 썰고 대파는 어슷 썰어주세요.",
+        "멸치 육수를 끓이다가 두부를 넣어주세요.",
+        "국간장과 소금으로 간을 맞춰주세요.",
+        "풀어둔 달걀을 둘러 붓고 젓지 말고 30초 정도 익혀주세요.",
+        "대파를 넣고 한소끔 끓여 마무리해주세요."
+      ]
+    },
+    {
+      "tempId": "api-3",
+      "source": "api",
+      "title": "두부 스크램블",
+      "description": "달걀과 두부로 만드는 고단백 한 접시",
+      "time": 10,
+      "portion": 1,
+      "type": "일품",
+      "method": "볶음",
+      "ingredients": [
+        { "type": 0, "name": "두부", "quantity": "1/3모" },
+        { "type": 0, "name": "달걀", "quantity": "2개" },
+        { "type": 0, "name": "방울토마토", "quantity": "5개" },
+        { "type": 1, "name": "소금", "quantity": "약간" },
+        { "type": 1, "name": "후추", "quantity": "약간" },
+        { "type": 1, "name": "버터", "quantity": "1작은술" }
+      ],
+      "steps": [
+        "두부는 손으로 으깨 물기를 꼭 짜주세요.",
+        "달걀을 풀어 소금, 후추로 간해주세요.",
+        "버터를 녹인 팬에 두부를 볶아 수분을 날려주세요.",
+        "달걀물을 붓고 저어가며 부드럽게 익혀주세요.",
+        "반 자른 방울토마토를 곁들여 마무리해주세요."
+      ]
+    }
+  ]
+}

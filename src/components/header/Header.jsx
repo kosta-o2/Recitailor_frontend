@@ -38,6 +38,9 @@ function Header() {
           <Link to="/post" className={styles.link}>
             사용자 레시피
           </Link>
+          <Link to="/ai/posts" className={styles.link}>
+            AI 레시피 모음
+          </Link>
         </nav>
         <div className={styles.account}>
           {member ? (
