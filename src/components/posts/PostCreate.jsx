@@ -1,96 +1,68 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import "./PostCreate.css";
-import { createRecipePost } from "../../api/recipePostApi";
-
-// 조리 방식
-const METHOD_OPTIONS = [
-  "볶음",
-  "끓이기",
-  "부침",
-  "조림",
-  "무침",
-  "비빔",
-  "찜",
-  "절임",
-  "튀김",
-  "삶기",
-  "굽기",
-  "데치기",
-  "회",
-  "기타",
-];
-
-// 요리 종류
-const TYPE_OPTIONS = [
-  "밑반찬",
-  "메인반찬",
-  "국/탕",
-  "찌개",
-  "디저트",
-  "면/만두",
-  "밥/죽/떡",
-  "퓨젼",
-  "김치/젓갈/장류",
-  "양념/소스/잼",
-  "양식",
-  "샐러드",
-  "스프",
-  "빵",
-  "과자",
-  "차/음료/술",
-  "기타",
-];
+import {
+  createRecipePostWithImage,
+  updateRecipePostWithImage,
+} from "../../api/recipePostApi";
+import { getSessionMember } from "../../api/session";
+import { METHOD_OPTIONS, TYPE_OPTIONS } from "./postUtil/categoryData.js";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
-const PostCreate = () => {
+const PostCreate = ({ initData = null }) => {
   const nav = useNavigate();
-
-  //수정되어야 하는것들///////
-  const nickname = "채재희";
-  const img_url = null;
-  /////////////////////////////////
+  const isEdit = Boolean(initData?.id);
+  const { nickname } = getSessionMember();
 
   // 기본 정보
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState(initData?.title ?? "");
+  const [content, setContent] = useState(initData?.content ?? "");
 
   // 이미지
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const imageInputRef = useRef(null);
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
 
   // 재료 및 양념
-  const [ingredients, setIngredients] = useState([""]);
-  const [sauces, setSauces] = useState([""]);
-
+  const [ingredients, setIngredients] = useState(
+    initData?.all_ingredient?.ingredients ?? [""],
+  );
+  const [sauces, setSauces] = useState(
+    initData?.all_ingredient?.sauces ?? [""],
+  );
   // 조리 순서
-  const [recipes, setRecipes] = useState([""]);
+  const [recipes, setRecipes] = useState(initData?.recipes ?? [""]);
 
   // 조리 정보
-  const [time, setTime] = useState("");
-  const [portion, setPortion] = useState("");
+  const [time, setTime] = useState(String(initData?.time ?? ""));
+  const [portion, setPortion] = useState(initData?.portion ?? "");
 
   // 카테고리
-  const [method, setMethod] = useState("");
-  const [type, setType] = useState("");
+  const [method, setMethod] = useState(initData?.category?.method ?? "");
+  const [type, setType] = useState(initData?.category?.type ?? "");
 
   //생성 연속 클릭 방지
-  const [isSubmitting, setIsSubmitting] = useState();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 이미지 미리보기 URL 관리
   // 이미지 미리보기 URL 관리
   useEffect(() => {
-    if (!image) {
+    if (isImageRemoved) {
       setImagePreview(null);
       return;
     }
 
-    const previewUrl = URL.createObjectURL(image);
-    setImagePreview(previewUrl);
+    if (image) {
+      const previewUrl = URL.createObjectURL(image);
+      setImagePreview(previewUrl);
 
-    return () => URL.revokeObjectURL(previewUrl);
-  }, [image]);
+      return () => URL.revokeObjectURL(previewUrl);
+    }
 
+    setImagePreview(initData?.img_url ?? null);
+  }, [image, initData?.img_url, isImageRemoved]);
   // 이미지 선택 및 검증
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -109,12 +81,13 @@ const PostCreate = () => {
       alert("이미지 크기는 5MB 이하만 가능합니다.");
       return;
     }
-
+    setIsImageRemoved(false);
     setImage(file);
   };
 
   const handleImageRemove = () => {
     setImage(null);
+    setIsImageRemoved(true);
 
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
@@ -147,8 +120,7 @@ const PostCreate = () => {
     );
 
     if (confirmed) {
-      // 프로젝트의 실제 게시글 목록 경로에 맞게 변경
-      nav("/post");
+      nav(-1);
     }
   };
 
@@ -210,10 +182,9 @@ const PostCreate = () => {
         type,
       },
       recipes: validRecipes,
-      likes: 0,
-      img_url: img_url, //이미지 url구조 완성되어야한다.
-      create_at: new Date().toLocaleTimeString(),
-      update_at: new Date().toLocaleTimeString(),
+      likes: isEdit ? initData?.likes : 0,
+      create_at: isEdit ? initData?.create_at : new Date().toLocaleString(),
+      update_at: new Date().toLocaleString(),
     };
 
     console.log("등록할 게시글 객체:", recipeData);
@@ -225,18 +196,26 @@ const PostCreate = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await createRecipePost(recipeData);
+      if (isEdit) {
+        // 게시글 수정
+        await updateRecipePostWithImage(
+          initData.id,
+          recipeData,
+          image,
+          isImageRemoved,
+        );
+        alert("게시글이 수정되었습니다.");
+      } else {
+        // 게시글 생성
+        await createRecipePostWithImage(recipeData, image);
 
-      console.log("게시글 생성 성공:", response);
-      alert("레시피가 등록되었습니다.");
+        alert("게시글이 생성되었습니다.");
+      }
 
       nav("/post");
     } catch (error) {
-      console.error("게시글 생성 실패:", error);
-
-      alert(
-        error.response?.data?.message || "게시글 등록 중 오류가 발생했습니다.",
-      );
+      console.error("게시글 저장 실패:", error);
+      alert("게시글 저장 중 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -251,7 +230,9 @@ const PostCreate = () => {
       >
         {/* 페이지 제목 */}
         <div className="post-create-header">
-          <div className="post-create-title">레시피 생성</div>
+          <div className="post-create-title">
+            {isEdit ? "레시피 수정" : "레시피 생성"}
+          </div>
           <div className="post-create-description">
             나만의 레시피를 작성하고 공유해 보세요.
           </div>
@@ -539,7 +520,11 @@ const PostCreate = () => {
             disabled={isSubmitting}
             className="post-create-submit"
           >
-            {isSubmitting ? "등록 중..." : "레시피 등록"}
+            {isSubmitting
+              ? "저장 중..."
+              : isEdit
+                ? "레시피 수정"
+                : "레시피 등록"}
           </button>
         </div>
 

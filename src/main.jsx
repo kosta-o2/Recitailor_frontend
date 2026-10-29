@@ -24,6 +24,7 @@ import MyPostsPage from "./pages/MyPostsPage.jsx";
 import MyLikesPage from "./pages/MyLikesPage.jsx";
 import WithdrawPage from "./pages/WithdrawPage.jsx";
 import WithdrawCompletePage from "./pages/WithdrawCompletePage.jsx";
+import PostCreatePage from "./pages/PostCreatePage .jsx";
 import AiSearchResultsPage from "./pages/AiSearchResultsPage.jsx";
 import AiCreateResultsPage from "./pages/AiCreateResultsPage.jsx";
 import AiRecipeDetailPage from "./pages/AiRecipeDetailPage.jsx";
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
           { index: true, element: <PostList /> },
           { path: ":id", element: <Post /> },
           { path: "create", element: <PostCreate /> },
+          { path: "edit/:id", element: <PostCreatePage /> },
         ],
       },
       {
