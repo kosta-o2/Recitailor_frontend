@@ -64,6 +64,7 @@ function createMypageRouter(db) {
     return {
       id: recipe.id,
       title: recipe.title,
+      post_type: recipe.post_type ?? "normal",
       create_at: recipe.create_at,
       likes: likeCount(recipe.id),
     };

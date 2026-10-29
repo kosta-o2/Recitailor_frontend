@@ -35,7 +35,10 @@ function LoginPage() {
     await submit(async () => {
       const data = await login({ id: id.trim(), password });
       authLogin(data.member);
-      navigate(location.state?.from?.pathname ?? "/", { replace: true });
+      const from = location.state?.from;
+      navigate(from ? `${from.pathname}${from.search ?? ""}` : "/", {
+        replace: true,
+      });
     });
   }
 
