@@ -24,6 +24,7 @@ import MyPostsPage from "./pages/MyPostsPage.jsx";
 import MyLikesPage from "./pages/MyLikesPage.jsx";
 import WithdrawPage from "./pages/WithdrawPage.jsx";
 import WithdrawCompletePage from "./pages/WithdrawCompletePage.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
