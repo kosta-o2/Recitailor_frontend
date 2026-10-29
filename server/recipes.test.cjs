@@ -351,3 +351,147 @@ test("AI 레시피 post_type 저장/노출", async (t) => {
     assert.deepEqual(types, ["ai_create", "ai_search", "normal", "normal"]);
   });
 });
+
+test("좋아요: favorites 집계, 정렬, 삭제 정리", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recitailor-"));
+  const app = await start(seed(dir), path.join(dir, "images"));
+  t.after(async () => {
+    await app.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+  const alice = await login(app.base, "alice");
+  const bob = await login(app.base, "bob");
+  const like = (token, id) =>
+    fetch(`${app.base}/api/mypage/favorites/${id}`, {
+      method: "PUT",
+      headers: auth(token),
+    });
+  const unlike = (token, id) =>
+    fetch(`${app.base}/api/mypage/favorites/${id}`, {
+      method: "DELETE",
+      headers: auth(token),
+    });
+  const get = async (url, token) =>
+    (await fetch(`${app.base}/api/${url}`, { headers: token ? auth(token) : {} })).json();
+
+  await t.test("좋아요하면 ERD 컬럼(recipe_posts_id)으로 저장되고 중복되지 않는다", async () => {
+    assert.equal((await like(alice, 2)).status, 201);
+    assert.equal((await like(alice, 2)).status, 200);
+
+    const rows = app.db.get("favorites").value();
+    assert.equal(rows.length, 1);
+    assert.deepEqual(Object.keys(rows[0]).sort(), ["id", "members_id", "recipe_posts_id"]);
+    assert.equal(rows[0].recipe_posts_id, 2);
+  });
+
+  await t.test("목록/상세에 집계된 likes와 내 liked가 담긴다", async () => {
+    await like(bob, 2);
+
+    const asAlice = await get("recipes", alice);
+    assert.equal(asAlice.find((r) => r.id === 2).likes, 2);
+    assert.equal(asAlice.find((r) => r.id === 2).liked, true);
+    assert.equal(asAlice.find((r) => r.id === 1).likes, 0);
+    assert.equal(asAlice.find((r) => r.id === 1).liked, false);
+
+    const anonymous = await get("recipes/2");
+    assert.equal(anonymous.likes, 2);
+    assert.equal(anonymous.liked, false);
+  });
+
+  await t.test("좋아요 순 정렬은 favorites 집계 기준이다", async () => {
+    const list = await get("recipes?_sort=likes&_order=desc");
+    assert.deepEqual(list.map((r) => r.id), [2, 1]);
+
+    await unlike(alice, 2);
+    await unlike(bob, 2);
+    await like(bob, 1);
+
+    const after = await get("recipes?_sort=likes&_order=desc");
+    assert.deepEqual(after.map((r) => r.id), [1, 2]);
+    assert.equal(after[0].likes, 1);
+  });
+
+  await t.test("마이페이지 좋아요 목록과 개수가 맞는다", async () => {
+    const mine = await get("mypage/favorites", bob);
+    assert.equal(mine.total, 1);
+    assert.equal(mine.items[0].id, 1);
+
+    const info = await get("mypage", bob);
+    assert.equal(info.favoriteCount, 1);
+  });
+
+  await t.test("게시글을 삭제하면 그 글의 좋아요도 사라진다", async () => {
+    const created = await (
+      await fetch(`${app.base}/api/recipes`, {
+        method: "POST",
+        headers: { ...auth(alice), "Content-Type": "application/json" },
+        body: JSON.stringify(POST),
+      })
+    ).json();
+
+    await like(bob, created.id);
+    assert.equal((await get("mypage", bob)).favoriteCount, 2);
+
+    const del = await fetch(`${app.base}/api/recipes/${created.id}`, {
+      method: "DELETE",
+      headers: auth(alice),
+    });
+    assert.equal(del.status, 200);
+
+    assert.equal((await get("mypage", bob)).favoriteCount, 1);
+
+    // 같은 id로 새 글이 만들어져도 이전 좋아요를 이어받지 않는다.
+    const next = await (
+      await fetch(`${app.base}/api/recipes`, {
+        method: "POST",
+        headers: { ...auth(alice), "Content-Type": "application/json" },
+        body: JSON.stringify(POST),
+      })
+    ).json();
+    assert.equal(next.id, created.id);
+    assert.equal(next.likes, 0);
+    assert.equal(next.liked, false);
+  });
+
+  await t.test("AI 글도 좋아요할 수 있다", async () => {
+    const ai = await (
+      await fetch(`${app.base}/api/recipes`, {
+        method: "POST",
+        headers: { ...auth(alice), "Content-Type": "application/json" },
+        body: JSON.stringify({ ...POST, post_type: "ai_create" }),
+      })
+    ).json();
+
+    assert.equal((await like(bob, ai.id)).status, 201);
+    assert.equal((await get(`recipes/${ai.id}`, bob)).likes, 1);
+  });
+
+  await t.test("존재하지 않는 글/미로그인은 거절한다", async () => {
+    assert.equal((await like(alice, 999)).status, 404);
+
+    const res = await fetch(`${app.base}/api/mypage/favorites/1`, { method: "PUT" });
+    assert.equal(res.status, 401);
+  });
+});
+
+test("이전 컬럼명(recipes_id)의 favorites는 시작할 때 recipe_posts_id로 바뀐다", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "recitailor-"));
+  const dbFile = seed(dir);
+  const data = JSON.parse(fs.readFileSync(dbFile, "utf8"));
+  data.favorites = [{ id: 1, members_id: "alice", recipes_id: 2 }];
+  fs.writeFileSync(dbFile, JSON.stringify(data));
+
+  const app = await start(dbFile, path.join(dir, "images"));
+  t.after(async () => {
+    await app.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  assert.deepEqual(app.db.get("favorites").value(), [
+    { id: 1, members_id: "alice", recipe_posts_id: 2 },
+  ]);
+  assert.equal(
+    (await (await fetch(`${app.base}/api/recipes/2`)).json()).likes,
+    1,
+  );
+});
