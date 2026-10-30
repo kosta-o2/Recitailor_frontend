@@ -497,7 +497,7 @@
         "팬을 달구고 재워둔 고기와 야채를 함께 넣고 센 불에서 볶아줍니다.",
         "고기가 완전히 익으면 불을 끄고 담아냅니다."
       ],
-      "likes": 1,
+      "likes": 0,
       "img_url": null,
       "create_at": "2026-03-02T11:00:00Z",
       "update_at": "2026-03-02T11:00:00Z",
@@ -2073,6 +2073,34 @@
       "img_url": null,
       "create_at": "2026-10-29T08:47:00.196Z",
       "update_at": "2026-10-29T08:47:00.196Z"
+    },
+    {
+      "id": 56,
+      "title": "zxc",
+      "post_type": "normal",
+      "content": "asd",
+      "portion": "",
+      "time": null,
+      "all_ingredient": {
+        "ingredients": [
+          "asd"
+        ],
+        "sauces": [
+          "124"
+        ]
+      },
+      "category": {
+        "method": "회",
+        "type": "양식"
+      },
+      "recipes": [
+        "124"
+      ],
+      "author": "asdf",
+      "likes": 0,
+      "img_url": null,
+      "create_at": "2026-10-29T15:33:35.236Z",
+      "update_at": "2026-10-29T15:33:35.236Z"
     }
   ],
   "members": [
@@ -2168,5 +2196,11 @@
     }
   ],
   "favorites": [],
-  "recipe_post_images": []
+  "recipe_post_images": [
+    {
+      "id": 1,
+      "img_url": "/uploads/228ad0c0-04fe-4ac4-9090-4ffd922ec3f8.png",
+      "recipe_posts_id": 56
+    }
+  ]
 }
